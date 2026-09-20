@@ -1,590 +1,656 @@
-const WHATSAPP_NUMBER = "5591991143369";
-const CART_KEY = "cheia-de-mimo-cart";
+/* ========================================================================
+   CHEIA DE MIMO HOME · CONFIGURAÇÃO DA LOJA
+   Edite os campos abaixo. Não é necessário editar HTML ou CSS para cadastrar
+   produtos. A pasta produtos/ NÃO é lida automaticamente.
+========================================================================= */
+const CONFIG = {
+  whatsapp: "5591991143369",             // DDI + DDD + número, só dígitos
+  mensagemWhatsApp: "Olá! Gostaria de conhecer os produtos da Cheia de Mimo Home.",
+};
 
-// Os endereços enviados são Viewer Links do ImgBB (ibb.co/...).
-// Um Viewer Link entrega HTML, então ele NÃO pode ser usado diretamente em <img src>.
-// A loja resolve o endereço direto i.ibb.co somente quando a foto entra na tela,
-// guarda o resultado no navegador e depois usa o arquivo externo normalmente.
-const IMAGE_CACHE_KEY = "cheia-de-mimo-direct-images-v3";
+/* CATÁLOGO MANUAL
+   - ativo: false => esconde o produto sem apagar o cadastro.
+   - frente: primeira foto; verso: segunda foto (se houver).
+   - exibirVerso: true => habilita Frente / Verso, mas SÓ se verso tiver link.
+   - id: cada produto deve ter um número único, que não muda ao reordenar.
+   - Cada produto tem seu próprio preço, nome, texto e imagens.
 
-function loadImageCache() {
-  try { return JSON.parse(localStorage.getItem(IMAGE_CACHE_KEY)) || {}; }
-  catch { return {}; }
-}
-
-const directImageCache = loadImageCache();
-const pendingImageRequests = new Map();
-
-function saveImageCache() {
-  try { localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(directImageCache)); }
-  catch {}
-}
-
-function cleanDirectUrl(url) {
-  return String(url || "")
-    .replace(/&amp;/g, "&")
-    .replace(/\\\//g, "/")
-    .replace(/[\\),.;]+$/g, "")
-    .trim();
-}
-
-function extractDirectImageUrl(text) {
-  if (!text) return null;
-  const decoded = String(text)
-    .replace(/&amp;/g, "&")
-    .replace(/\\u002F/gi, "/")
-    .replace(/\\\//g, "/");
-
-  // ImgBB usa i.ibb.co para o arquivo real. Pegamos primeiro URLs com extensão de imagem.
-  const imagePattern = /https?:\/\/i\.ibb\.co\/[A-Za-z0-9_~!$&'()*+,;=:@%./?\-]+?\.(?:jpe?g|png|webp|gif|avif)(?:\?[^\s"'<>\])}]*)?/gi;
-  const imageMatches = decoded.match(imagePattern) || [];
-  if (imageMatches.length) return cleanDirectUrl(imageMatches[0]);
-
-  // Fallback para respostas que omitem a extensão na serialização.
-  const genericPattern = /https?:\/\/i\.ibb\.co\/[A-Za-z0-9_~!$&'()*+,;=:@%./?\-]+/gi;
-  const genericMatches = decoded.match(genericPattern) || [];
-  return genericMatches.length ? cleanDirectUrl(genericMatches[0]) : null;
-}
-
-async function fetchTextWithTimeout(url, timeout = 15000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      cache: "force-cache",
-      signal: controller.signal,
-      headers: { "Accept": "text/plain,text/html,application/json;q=0.9,*/*;q=0.8" }
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.text();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function resolveDirectImage(viewerUrl) {
-  if (!viewerUrl) throw new Error("Link da foto ausente");
-  if (/^https?:\/\/i\.ibb\.co\//i.test(viewerUrl)) return viewerUrl;
-  if (directImageCache[viewerUrl]) return directImageCache[viewerUrl];
-  if (pendingImageRequests.has(viewerUrl)) return pendingImageRequests.get(viewerUrl);
-
-  const task = (async () => {
-    const readerUrls = [
-      `https://r.jina.ai/https://ibb.co/${viewerUrl.split("/").pop()}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(viewerUrl)}`
-    ];
-
-    let lastError;
-    for (const proxyUrl of readerUrls) {
-      try {
-        const text = await fetchTextWithTimeout(proxyUrl);
-        const directUrl = extractDirectImageUrl(text);
-        if (directUrl) {
-          directImageCache[viewerUrl] = directUrl;
-          saveImageCache();
-          return directUrl;
-        }
-        lastError = new Error("Endereço direto não encontrado na resposta");
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw lastError || new Error("Não foi possível resolver a imagem");
-  })();
-
-  pendingImageRequests.set(viewerUrl, task);
-  try {
-    return await task;
-  } finally {
-    pendingImageRequests.delete(viewerUrl);
-  }
-}
-
-function setResolvedImage(img, directUrl) {
-  if (!img || !directUrl) return;
-  img.onload = () => {
-    img.classList.add("is-loaded");
-    img.closest(".product-image-wrap, .cart-item-image-wrap")?.classList.remove("is-loading", "image-error");
-  };
-  img.onerror = () => {
-    img.classList.remove("is-loaded");
-    img.closest(".product-image-wrap, .cart-item-image-wrap")?.classList.add("image-error");
-  };
-  img.src = directUrl;
-}
-
-async function hydrateProductImage(wrap, viewerUrl) {
-  if (!wrap || !viewerUrl || wrap.dataset.loadedViewer === viewerUrl) return;
-  const img = wrap.querySelector(".product-main-image");
-  if (!img) return;
-
-  wrap.classList.add("is-loading");
-  wrap.classList.remove("image-error");
-  try {
-    const directUrl = await resolveDirectImage(viewerUrl);
-    wrap.dataset.loadedViewer = viewerUrl;
-    setResolvedImage(img, directUrl);
-  } catch (error) {
-    console.error("Falha ao carregar foto do produto:", viewerUrl, error);
-    wrap.classList.remove("is-loading");
-    wrap.classList.add("image-error");
-  }
-}
-
-let imageObserver;
-function observeProductImages() {
-  if (imageObserver) imageObserver.disconnect();
-
-  const wraps = [...document.querySelectorAll(".product-image-wrap[data-viewer-url]")];
-  if (!("IntersectionObserver" in window)) {
-    wraps.forEach(wrap => hydrateProductImage(wrap, wrap.dataset.viewerUrl));
-    return;
-  }
-
-  imageObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const wrap = entry.target;
-      hydrateProductImage(wrap, wrap.dataset.viewerUrl);
-      imageObserver.unobserve(wrap);
-    });
-  }, { rootMargin: "500px 0px" });
-
-  wraps.forEach(wrap => imageObserver.observe(wrap));
-}
-
-const products = [
+   EXEMPLO para COPIAR e colar antes do último ];
+   {
+     id: 23,
+     nome: "Nome do seu produto",
+     categoria: "Jogo americano",
+     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+     preco: 29.90,
+     frente: "produtos/minha-foto-frente.jpg",
+     verso: "produtos/minha-foto-verso.jpg",
+     exibirVerso: true,
+     ativo: true,
+   },
+*/
+const PRODUTOS = [
+  
+  
+   
   {
-    id: "listrado-verde-branco-1",
-    name: "Jogo americano listrado verde com branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 23,
-    photos: [
-      { page: "https://ibb.co/4ZZc53Mk" },
-      { page: "https://ibb.co/mC2w32rf" }
-    ],
-    alt: "Jogo americano listrado verde com branco, dupla face e impermeável"
+    id: 2,
+    nome: "Jogo Americano — Modelo 01",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 2.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 2 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "listrado-verde-branco-2",
-    name: "Jogo americano listrado verde com branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 23,
-    photos: [
-      { page: "https://ibb.co/4n9CmQHT" },
-      { page: "https://ibb.co/7JSPm68z" }
-    ],
-    alt: "Jogo americano listrado verde com branco, dupla face e impermeável"
+    id: 3,
+    nome: "Jogo Americano — Modelo 02",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 3.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 3 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "listrado-rosa-branco",
-    name: "Jogo americano listrado rosa com branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 24,
-    photos: [
-      { page: "https://ibb.co/4n9CmQHT" },
-      { page: "https://ibb.co/7JSPm68z" }
-    ],
-    alt: "Jogo americano listrado rosa com branco, dupla face e impermeável"
+    id: 4,
+    nome: "Jogo Americano — Modelo 03",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 4.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 4 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "listrado-azul-branco",
-    name: "Jogo americano listrado azul com branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 24,
-    photos: [
-      { page: "https://ibb.co/zWsy7HVs" },
-      { page: "https://ibb.co/zHPyxn4X" }
-    ],
-    alt: "Jogo americano listrado azul com branco, dupla face e impermeável"
+    id: 5,
+    nome: "Jogo Americano — Modelo 04",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 5.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 5 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "xadrez-preto-branco-1",
-    name: "Jogo americano xadrez preto e branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 18,
-    photos: [
-      { page: "https://ibb.co/fY16q1TC" },
-      { page: "https://ibb.co/5gfJJ5ds" }
-    ],
-    alt: "Jogo americano xadrez preto e branco, dupla face e impermeável"
+    id: 6,
+    nome: "Jogo Americano — Modelo 05",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 6.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 6 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "xadrez-preto-branco-2",
-    name: "Jogo americano xadrez preto e branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 18,
-    photos: [
-      { page: "https://ibb.co/tPqwV8kN" },
-      { page: "https://ibb.co/NktMtZs" }
-    ],
-    alt: "Jogo americano xadrez preto e branco, dupla face e impermeável"
+    id: 7,
+    nome: "Jogo Americano — Modelo 06",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 7.jpeg",
+    verso: "produtos/Produto 8.jpeg",                 // Opcional: "produtos/Produto 7 - Verso.jpg"
+    exibirVerso: true,         // Mude para true para liberar a troca de foto
+    ativo: true,
+  },
+ 
+  {
+    id: 9,
+    nome: "Jogo Americano — Modelo 08",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 9.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 9 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "xadrez-verde-branco",
-    name: "Jogo americano xadrez verde com branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 16,
-    photos: [
-      { page: "https://ibb.co/nMMzypRB" },
-      { page: "https://ibb.co/KjSjSH7p" }
-    ],
-    alt: "Jogo americano xadrez verde com branco, dupla face e impermeável"
+    id: 10,
+    nome: "Jogo Americano — Modelo 09",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 10.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 10 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "xadrez-rosa-verde",
-    name: "Jogo americano xadrez rosa e verde",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 20,
-    photos: [
-      { page: "https://ibb.co/jt6J0L9" },
-      { page: "https://ibb.co/Kxr05T4F" }
-    ],
-    alt: "Jogo americano xadrez rosa e verde, dupla face e impermeável"
+    id: 11,
+    nome: "Jogo Americano — Modelo 10",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 11.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 11 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "xadrez-vermelho-branco",
-    name: "Jogo americano xadrez vermelho com branco",
-    collection: "Jogo americano",
-    category: "Dupla face e impermeável",
-    price: 29,
-    stock: 18,
-    photos: [
-      { page: "https://ibb.co/vvJYK6ts" },
-      { page: "https://ibb.co/wZrspmjh" }
-    ],
-    alt: "Jogo americano xadrez vermelho com branco, dupla face e impermeável"
+    id: 12,
+    nome: "Jogo Americano — Modelo 11",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 12.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 12 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "kiwi",
-    name: "Jogo americano de kiwi",
-    collection: "Jogo americano",
-    category: "Impermeável",
-    price: 26,
-    stock: 12,
-    photos: [{ page: "https://ibb.co/pjsQ1xSv" }],
-    alt: "Jogo americano de kiwi impermeável"
+    id: 13,
+    nome: "Jogo Americano — Modelo 12",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 13.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 13 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "mamao",
-    name: "Jogo americano de mamão",
-    collection: "Jogo americano",
-    category: "Impermeável",
-    price: 26,
-    stock: 16,
-    photos: [{ page: "https://ibb.co/RkjPwk3r" }],
-    alt: "Jogo americano de mamão impermeável"
+    id: 14,
+    nome: "Jogo Americano — Modelo 13",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 14.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 14 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "banana",
-    name: "Jogo americano de banana",
-    collection: "Jogo americano",
-    category: "Impermeável",
-    price: 26,
-    stock: 18,
-    photos: [{ page: "https://ibb.co/DHdx10xv" }],
-    alt: "Jogo americano de banana impermeável"
+    id: 15,
+    nome: "Jogo Americano — Modelo 14",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 15.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 15 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "morango-rosa",
-    name: "Jogo americano de morango rosa",
-    collection: "Jogo americano",
-    category: "Impermeável",
-    price: 26,
-    stock: 24,
-    photos: [{ page: "https://ibb.co/vxL5bhfd" }],
-    alt: "Jogo americano de morango rosa impermeável"
+    id: 16,
+    nome: "Jogo Americano — Modelo 15",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 16.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 16 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
   },
   {
-    id: "morango",
-    name: "Jogo americano de morango",
-    collection: "Jogo americano",
-    category: "Impermeável",
-    price: 26,
-    stock: 18,
-    photos: [{ page: "https://ibb.co/kV9kzc4g" }],
-    alt: "Jogo americano de morango impermeável"
-  }
+    id: 17,
+    nome: "Jogo Americano — Modelo 17",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 17.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 17 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
+  },
+  {
+    id: 18,
+    nome: "Jogo Americano — Modelo 18",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 18.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 18 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
+  },
+  {
+    id: 19,
+    nome: "Jogo Americano — Modelo 19",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 19.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 19 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
+  },
+
+  {
+    id: 21,
+    nome: "Jogo Americano — Modelo 21",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 21.jpeg",
+    verso: "produtos/Produto 20.jpeg",                 // Opcional: "produtos/Produto 21 - Verso.jpg"
+    exibirVerso: true,         // Mude para true para liberar a troca de foto
+    ativo: true,
+  },
+  {
+    id: 22,
+    nome: "Jogo Americano — Modelo 22",
+    categoria: "Jogo americano",
+    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
+    preco: 29.90,
+    frente: "produtos/Produto 22.jpeg",
+    verso: "",                 // Opcional: "produtos/Produto 22 - Verso.jpg"
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    ativo: true,
+  },
+ ];
+
+/* CARROSSEL DE VÍDEOS: nomes SEM espaço e SEM acento, exatos no GitHub Pages.
+   Coloque os arquivos MP4 na pasta "videos" com os nomes abaixo.
+   O cartão fica marcado "Em breve" se o arquivo não tiver sido enviado.
+   Pode editar titulo e capa; a capa reutiliza fotos originais, sem alterá-las.
+   Para ocultar um cartão, defina ativo: false.
+*/
+const VIDEOS = [
+  { titulo: " ", arquivo: "videos/Video1.mp4", capa: "produtos/capa2.jpeg", ativo: true },
+  { titulo: " ", arquivo: "videos/Video2.mp4", capa: "produtos/capa1.jpeg", ativo: true },
+  { titulo: " ", arquivo: "videos/Video3.mp4", capa: "produtos/Produto 9.jpeg", ativo: true },
+  { titulo: " ", arquivo: "videos/Video4.mp4", capa: "produtos/Produto 21.jpeg", ativo: true },
 ];
 
-const $ = selector => document.querySelector(selector);
-const grid = $("#productsGrid");
-const cartBody = $("#cartBody");
-const panel = $("#cartPanel");
-const backdrop = $("#cartBackdrop");
+/* ========================================================================
+   MOTOR DA LOJA · não é necessário alterar abaixo desta linha.
+========================================================================= */
 
-function formatPrice(value) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+const $ = (selector) => document.querySelector(selector);
+const el = {
+  body: document.body,
+  header: $(".site-header"),
+  menu: $(".menu-trigger"),
+  mobileNav: $(".mobile-nav"),
+  grid: $("[data-products-grid]"),
+  search: $("[data-product-search]"),
+  productCount: $("[data-products-count]"),
+  videoCarousel: $("[data-video-carousel]"),
+  cartDrawer: $("[data-cart-drawer]"),
+  cartItems: $("[data-cart-items]"),
+  cartTotal: $("[data-cart-total]"),
+  cartCounts: document.querySelectorAll("[data-cart-count]"),
+  checkout: $("[data-checkout]"),
+  toast: $("[data-toast]"),
+};
 
-function loadCart() {
+function readCart() {
   try {
-    const stored = JSON.parse(localStorage.getItem(CART_KEY)) || [];
-    return stored
-      .map(item => {
-        const product = products.find(productItem => productItem.id === item.id);
-        if (!product) return null;
-        return {
-          ...product,
-          quantity: Math.min(Math.max(Number(item.quantity) || 1, 1), product.stock)
-        };
-      })
-      .filter(Boolean);
+    const value = JSON.parse(localStorage.getItem("cheiaDeMimoCart") || "{}");
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
   } catch {
-    return [];
+    return {};
   }
 }
 
-let cart = loadCart();
+const state = {
+  products: PRODUTOS.filter((product) => product.ativo !== false),
+  cart: readCart(),
+  lastFocus: null,
+};
 
-function saveCart() {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-}
-
-function totalItems() {
-  return cart.reduce((sum, item) => sum + item.quantity, 0);
-}
-
-function totalValue() {
-  return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-}
-
-function cartQuantityFor(id) {
-  return cart.find(item => item.id === id)?.quantity || 0;
-}
+const money = (value) => new Intl.NumberFormat("pt-BR", {
+  style: "currency", currency: "BRL",
+}).format(value);
+const price = (product) => (product.preco > 0 ? money(product.preco) : "Valor sob consulta");
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+})[character]);
+const normalize = (value) => String(value ?? "").normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 function renderProducts() {
-  grid.innerHTML = products.map(product => {
-    const selected = cartQuantityFor(product.id);
-    const reachedStock = selected >= product.stock;
-    const firstPhoto = product.photos[0];
-
-    return `
-      <article class="product-card" data-product-id="${product.id}">
-        <div class="product-gallery">
-          <div class="product-image-wrap is-loading" data-viewer-url="${firstPhoto.page}" aria-label="Foto de ${product.name}">
-            <img class="product-main-image" alt="${product.alt}" decoding="async">
-            <div class="product-image-status" aria-hidden="true">
-              <span class="image-loader"></span>
-              <small>Carregando foto</small>
-            </div>
-            <div class="product-image-error" aria-hidden="true">Foto indisponível</div>
-            ${product.photos.length > 1 ? `
-              <div class="product-photo-nav" aria-label="Fotos do produto">
-                ${product.photos.map((photo, index) => `
-                  <button type="button"
-                    class="product-photo-dot ${index === 0 ? "is-active" : ""}"
-                    data-viewer-url="${photo.page}"
-                    data-photo-index="${index}"
-                    aria-label="Mostrar foto ${index + 1} de ${product.name}">${index + 1}</button>
-                `).join("")}
-              </div>
-            ` : ""}
-          </div>
-        </div>
-        <div class="product-content">
-          <div>
-            <p class="product-collection">${product.collection}</p>
-            <p class="product-category">${product.category}</p>
-            <h3>${product.name}</h3>
-            <p class="product-price">${formatPrice(product.price)} <span>unidade</span></p>
-            <p class="availability">${product.stock} unidades disponíveis</p>
-          </div>
-          <button class="add-button" type="button" data-add="${product.id}" ${reachedStock ? "disabled" : ""}>${reachedStock ? "Limite atingido" : "Adicionar"}</button>
-        </div>
-      </article>
-    `;
-  }).join("");
-
-  observeProductImages();
-}
-
-function renderCart() {
-  const total = totalItems();
-  const value = totalValue();
-  $("#cartCount").textContent = total;
-  $("#cartTotal").textContent = total;
-  $("#cartValue").textContent = formatPrice(value);
-  $("#cartSubtitle").textContent = total
-    ? `${total} ${total === 1 ? "peça selecionada" : "peças selecionadas"}`
-    : "Escolha seus detalhes favoritos para começar.";
-  $("#cartSummary").hidden = total === 0;
-
-  if (!cart.length) {
-    cartBody.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">♡</div><h3>Seu carrinho está vazio</h3><p>Adicione produtos para montar seu pedido pelo WhatsApp.</p></div>';
-    renderProducts();
+  const term = normalize(el.search.value);
+  const shown = state.products.filter((product) =>
+    normalize(`${product.nome} ${product.categoria} ${product.descricao}`).includes(term)
+  );
+  el.productCount.textContent = `${shown.length} ${shown.length === 1 ? "produto" : "produtos"}`;
+  if (!shown.length) {
+    el.grid.innerHTML = `<div class="empty-state">${state.products.length
+      ? "Nenhum produto encontrado. Tente outro nome."
+      : "Nenhum produto ativo. Cadastre produtos na lista PRODUTOS do arquivo script.js."}</div>`;
     return;
   }
 
-  cartBody.innerHTML = cart.map(item => `
-    <article class="cart-item">
-      <div class="cart-item-image-wrap is-loading" data-cart-viewer-url="${item.photos[0].page}">
-        <img class="cart-item-image" alt="${item.alt}" decoding="async">
-      </div>
-      <div class="cart-item-info">
-        <p>${item.category}</p>
-        <h3>${item.name}</h3>
-        <p class="cart-item-price">${formatPrice(item.price)} cada · ${formatPrice(item.price * item.quantity)}</p>
-        <div class="quantity-control">
-          <button type="button" data-delta="-1" data-id="${item.id}" aria-label="Diminuir">−</button>
-          <span>${item.quantity}</span>
-          <button type="button" data-delta="1" data-id="${item.id}" aria-label="Aumentar" ${item.quantity >= item.stock ? "disabled" : ""}>+</button>
+  el.grid.innerHTML = shown.map((product, index) => {
+    const hasBack = Boolean(product.exibirVerso && String(product.verso || "").trim());
+    return `
+      <article class="product-card reveal" data-delay="${index % 3}">
+        <div class="product-media">
+          <img src="${escapeHtml(product.frente)}" alt="${escapeHtml(product.nome)} — frente" loading="lazy" decoding="async" data-product-image="${product.id}" />
+          <span class="media-label">Cheia de Mimo Home</span>
         </div>
-        <p class="cart-stock">Estoque: ${item.stock} unidades</p>
-      </div>
-      <button class="remove-button" type="button" data-remove="${item.id}" aria-label="Remover">×</button>
-    </article>
-  `).join("");
-
-  cartBody.querySelectorAll("[data-cart-viewer-url]").forEach(async wrap => {
-    try {
-      const directUrl = await resolveDirectImage(wrap.dataset.cartViewerUrl);
-      setResolvedImage(wrap.querySelector(".cart-item-image"), directUrl);
-    } catch {
-      wrap.classList.remove("is-loading");
-      wrap.classList.add("image-error");
-    }
-  });
-
-  $("#whatsappButton").href = buildWhatsAppUrl();
-  renderProducts();
+        <div class="product-content">
+          ${hasBack ? `<div class="side-switcher" role="group" aria-label="Ver fotos de ${escapeHtml(product.nome)}">
+            <button type="button" class="active" data-side="front" data-product-id="${product.id}" aria-pressed="true">Frente</button>
+            <button type="button" data-side="back" data-product-id="${product.id}" aria-pressed="false">Verso</button>
+          </div>` : `<span class="product-kicker">${escapeHtml(product.categoria)}</span>`}
+          <h3 class="product-name">${escapeHtml(product.nome)}</h3>
+          <p class="product-description">${escapeHtml(product.descricao)}</p>
+          <div class="product-purchase">
+            <p class="product-price">${price(product)}</p>
+            <button class="add-button" type="button" data-add-product="${product.id}" aria-label="Adicionar ${escapeHtml(product.nome)} à sacola">Adicionar <span aria-hidden="true">+</span></button>
+          </div>
+        </div>
+      </article>`;
+  }).join("");
+  observeReveals();
 }
 
-function buildWhatsAppUrl() {
-  const total = totalItems();
-  const value = totalValue();
-  const items = cart.map(item =>
-    `• ${item.quantity}x ${item.name}\n  ${formatPrice(item.price)} cada · ${formatPrice(item.price * item.quantity)}`
-  );
-  const message = [
-    "Olá! Vim pelo site da Cheia de Mimo Home e gostaria de fazer este pedido.",
-    "",
-    "*Meu pedido:*",
-    ...items,
-    "",
-    `*Total:* ${total} ${total === 1 ? "peça" : "peças"}`,
-    `*Valor dos produtos:* ${formatPrice(value)}`,
-    "",
-    "Pode me confirmar pagamento, prazo e entrega?"
-  ].join("\n");
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+function setupVideos() {
+  const enabled = VIDEOS.filter((video) => video.ativo !== false && video.arquivo && video.titulo);
+  const carousel = el.videoCarousel;
+  const dots = $("[data-video-dots]");
+  const indicator = $("[data-video-indicator]");
+  const prev = $("[data-video-prev]");
+  const next = $("[data-video-next]");
+  if (!enabled.length) {
+    $("#videos").hidden = true;
+    document.querySelectorAll("[data-video-nav]").forEach((nav) => { nav.hidden = true; });
+    return;
+  }
+  carousel.innerHTML = enabled.map((video, index) => `
+    <article class="video-card" data-video-card>
+      <div class="video-poster"><img class="video-poster-blur" src="${escapeHtml(video.capa)}" alt="" aria-hidden="true" loading="lazy" decoding="async" /><img class="video-poster-art" src="${escapeHtml(video.capa)}" alt="" loading="lazy" decoding="async" /></div>
+      <video hidden preload="metadata" playsinline controls poster="${escapeHtml(video.capa)}" aria-label="${escapeHtml(video.titulo)}">
+        <source src="${escapeHtml(video.arquivo)}" type="video/mp4" />
+      </video>
+      <div class="video-overlay">
+        <div class="video-card-top"><span>INSPIRAÇÃO ${String(index + 1).padStart(2, "0")}</span><span>✳</span></div>
+        <div class="video-card-bottom">
+          <p>CHEIA DE MIMO HOME</p><h3>${escapeHtml(video.titulo)}</h3>
+          <button type="button" class="video-play" hidden data-play-video aria-label="Assistir ${escapeHtml(video.titulo)}"><span aria-hidden="true">▶</span> Assistir vídeo</button>
+          <span class="video-unavailable">Em breve · ${escapeHtml(video.arquivo.split("/").pop())}</span>
+        </div>
+      </div>
+    </article>`).join("");
+  const cards = [...carousel.querySelectorAll("[data-video-card]")];
+  dots.innerHTML = cards.map((_, index) => `<button type="button" data-video-dot="${index}" aria-label="Ir para inspiração ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("");
+  const dotButtons = [...dots.querySelectorAll("button")];
+  let current = 0;
+  const leftOf = (card) => carousel.scrollLeft + card.getBoundingClientRect().left - carousel.getBoundingClientRect().left;
+  const goTo = (index, smooth = true) => {
+    const target = Math.max(0, Math.min(index, cards.length - 1));
+    carousel.scrollTo({ left: leftOf(cards[target]), behavior: smooth ? "smooth" : "instant" });
+    setCurrent(target);
+  };
+  function setCurrent(index) {
+    current = index;
+    indicator.textContent = `${String(index + 1).padStart(2, "0")} / ${String(cards.length).padStart(2, "0")}`;
+    dotButtons.forEach((dot, dotIndex) => dot.setAttribute("aria-current", String(dotIndex === index)));
+    prev.disabled = index === 0;
+    next.disabled = index === cards.length - 1 || carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 3;
+  }
+  prev.addEventListener("click", () => goTo(current - 1));
+  next.addEventListener("click", () => goTo(current + 1));
+  dotButtons.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
+  let scrollFrame = 0;
+  carousel.addEventListener("scroll", () => {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      const nearest = cards.reduce((best, card, index) =>
+        Math.abs(card.getBoundingClientRect().left - carousel.getBoundingClientRect().left) < Math.abs(cards[best].getBoundingClientRect().left - carousel.getBoundingClientRect().left) ? index : best, 0);
+      setCurrent(nearest);
+      // Não tocar áudio em um cartão que já saiu da tela.
+      cards.forEach((card, index) => { if (index !== nearest) card.querySelector("video").pause(); });
+    });
+  }, { passive: true });
+  carousel.addEventListener("keydown", (event) => {
+    if (event.target !== carousel) return;
+    if (event.key === "ArrowRight") { event.preventDefault(); goTo(current + 1); }
+    if (event.key === "ArrowLeft") { event.preventDefault(); goTo(current - 1); }
+  });
+  cards.forEach((card) => {
+    const video = card.querySelector("video");
+    const button = card.querySelector("[data-play-video]");
+    const available = () => { card.classList.add("video-ready"); button.hidden = false; };
+    const missing = () => {
+      card.classList.remove("video-ready", "is-playing");
+      card.classList.add("video-missing");
+      button.hidden = true; video.hidden = true;
+    };
+    video.addEventListener("loadedmetadata", available);
+    video.addEventListener("error", missing);
+    // source filho pode emitir erro separado do elemento <video>.
+    video.querySelector("source").addEventListener("error", missing);
+    button.addEventListener("click", async () => {
+      if (!card.classList.contains("video-ready")) return;
+      cards.forEach((other) => { if (other !== card) other.querySelector("video").pause(); });
+      video.hidden = false;
+      card.classList.add("is-playing");
+      try { await video.play(); }
+      catch { card.classList.remove("is-playing"); video.hidden = true; showToast("Não foi possível reproduzir o vídeo. Confira o arquivo MP4."); }
+    });
+    video.addEventListener("ended", () => { video.hidden = true; card.classList.remove("is-playing"); });
+  });
+  setCurrent(0);
+}
+
+function saveCart() {
+  try { localStorage.setItem("cheiaDeMimoCart", JSON.stringify(state.cart)); } catch { /* Navegação privada */ }
+}
+
+function cartEntries() {
+  return Object.entries(state.cart).map(([id, quantity]) => ({
+    product: state.products.find((item) => item.id === Number(id)),
+    quantity: Number(quantity),
+  })).filter(({ product, quantity }) => product && Number.isSafeInteger(quantity) && quantity > 0);
 }
 
 function addToCart(id) {
-  const product = products.find(item => item.id === id);
-  if (!product) return;
-
-  const existing = cart.find(item => item.id === id);
-  const currentQuantity = existing?.quantity || 0;
-
-  if (currentQuantity >= product.stock) {
-    showToast("Quantidade máxima disponível atingida");
-    return;
-  }
-
-  if (existing) existing.quantity += 1;
-  else cart.push({ ...product, quantity: 1 });
-
+  if (!state.products.some((product) => product.id === id)) return;
+  state.cart[id] = (Number(state.cart[id]) || 0) + 1;
   saveCart();
   renderCart();
-  showToast("Produto adicionado ao carrinho");
+  showToast("Produto adicionado à sacola");
 }
 
-function updateQuantity(id, delta) {
-  const item = cart.find(product => product.id === id);
-  if (!item) return;
-
-  const nextQuantity = item.quantity + delta;
-  if (nextQuantity > item.stock) {
-    showToast("Quantidade máxima disponível atingida");
-    return;
-  }
-
-  item.quantity = Math.max(1, nextQuantity);
+function changeQuantity(id, amount) {
+  const next = (Number(state.cart[id]) || 0) + amount;
+  if (next <= 0) delete state.cart[id];
+  else state.cart[id] = next;
   saveCart();
   renderCart();
 }
 
-function removeFromCart(id) {
-  cart = cart.filter(item => item.id !== id);
-  saveCart();
-  renderCart();
+function renderCart() {
+  const entries = cartEntries();
+  const count = entries.reduce((total, item) => total + item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + Math.max(0, Number(item.product.preco) || 0) * item.quantity, 0);
+  el.cartCounts.forEach((counter) => { counter.textContent = count; });
+  el.cartTotal.textContent = entries.every(({ product }) => product.preco > 0) ? money(total) : "A confirmar";
+  el.checkout.disabled = !entries.length;
+
+  if (!entries.length) {
+    el.cartItems.innerHTML = `<div class="cart-empty"><strong>Sua sacola está vazia.</strong><span>Escolha os produtos que mais combinam com você.</span></div>`;
+    return;
+  }
+  el.cartItems.innerHTML = entries.map(({ product, quantity }) => `
+    <article class="cart-item">
+      <img src="${escapeHtml(product.frente)}" alt="${escapeHtml(product.nome)}" loading="lazy" />
+      <div>
+        <h3>${escapeHtml(product.nome)}</h3><p>${price(product)}</p>
+        <div class="quantity" aria-label="Quantidade de ${escapeHtml(product.nome)}">
+          <button type="button" data-quantity="-1" data-product-id="${product.id}" aria-label="Diminuir quantidade">−</button>
+          <span>${quantity}</span>
+          <button type="button" data-quantity="1" data-product-id="${product.id}" aria-label="Aumentar quantidade">+</button>
+        </div>
+      </div>
+      <button class="remove-item" type="button" data-remove-product="${product.id}" aria-label="Remover ${escapeHtml(product.nome)}">Remover</button>
+    </article>`).join("");
 }
 
 function openCart() {
-  backdrop.hidden = false;
-  requestAnimationFrame(() => {
-    document.body.classList.add("cart-open");
-    panel.setAttribute("aria-hidden", "false");
-    $("#closeCart").focus();
-  });
+  state.lastFocus = document.activeElement;
+  el.cartDrawer.inert = false;
+  el.body.classList.add("cart-open");
+  el.cartDrawer.setAttribute("aria-hidden", "false");
+  $("[data-close-cart]").focus();
 }
 
 function closeCart() {
-  document.body.classList.remove("cart-open");
-  panel.setAttribute("aria-hidden", "true");
-  setTimeout(() => backdrop.hidden = true, 250);
-  $("#openCart").focus();
+  if (!el.body.classList.contains("cart-open")) return;
+  el.body.classList.remove("cart-open");
+  el.cartDrawer.setAttribute("aria-hidden", "true");
+  el.cartDrawer.inert = true;
+  if (state.lastFocus && state.lastFocus.isConnected) state.lastFocus.focus();
 }
 
+function checkoutWhatsApp() {
+  const entries = cartEntries();
+  if (!entries.length) return;
+  const count = entries.reduce((total, item) => total + item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + Math.max(0, Number(item.product.preco) || 0) * item.quantity, 0);
+  const lines = [
+    "Olá! Gostaria de fazer um pedido na Cheia de Mimo Home:", "",
+    ...entries.map(({ product, quantity }) => `• ${product.nome} — ${quantity} ${quantity === 1 ? "unidade" : "unidades"} — ${price(product.preco > 0 ? product : { preco: 0 }) === "Valor sob consulta" ? "valor sob consulta" : money(product.preco * quantity)}`),
+    "", `Total de peças: ${count}`,
+    entries.every(({ product }) => product.preco > 0) ? `Subtotal: ${money(total)}` : "Valor: a confirmar",
+    "", "Pode confirmar a disponibilidade e me orientar sobre entrega e pagamento?",
+  ];
+  window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener,noreferrer");
+}
+
+let toastTimer;
 function showToast(message) {
-  const toast = $("#toastMessage");
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+  el.toast.textContent = message;
+  el.toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.toast.classList.remove("show"), 2400);
 }
 
-grid.addEventListener("click", event => {
-  const photoButton = event.target.closest(".product-photo-dot[data-viewer-url]");
-  if (photoButton) {
-    const card = photoButton.closest(".product-card");
-    const wrap = card.querySelector(".product-image-wrap");
-    const viewerUrl = photoButton.dataset.viewerUrl;
-
-    card.querySelectorAll(".product-photo-dot").forEach(item => item.classList.remove("is-active"));
-    photoButton.classList.add("is-active");
-    wrap.dataset.viewerUrl = viewerUrl;
-    wrap.dataset.loadedViewer = "";
-    hydrateProductImage(wrap, viewerUrl);
+function observeReveals() {
+  const nodes = document.querySelectorAll(".reveal:not(.visible)");
+  if (!nodes.length) return;
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    nodes.forEach((node) => node.classList.add("visible"));
     return;
   }
+  const observer = new IntersectionObserver((entries, instance) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        instance.unobserve(entry.target);
+      }
+    });
+  }, { threshold: .06, rootMargin: "0px 0px 30px 0px" });
+  nodes.forEach((node) => observer.observe(node));
+}
 
-  const button = event.target.closest("[data-add]");
-  if (button) addToCart(button.dataset.add);
+function switchPhoto(button) {
+  const product = state.products.find((item) => item.id === Number(button.dataset.productId));
+  if (!product) return;
+  const back = button.dataset.side === "back";
+  if (back && !(product.exibirVerso && product.verso)) return;
+  const img = document.querySelector(`[data-product-image="${product.id}"]`);
+  if (!img) return;
+  const source = back ? product.verso : product.frente;
+  const oldSource = img.getAttribute("src");
+  const oldAlt = img.alt;
+  const buttons = button.parentElement.querySelectorAll("button");
+  buttons.forEach((item) => {
+    item.classList.toggle("active", item === button);
+    item.setAttribute("aria-pressed", String(item === button));
+  });
+  if (oldSource === source) return;
+  img.classList.add("is-switching");
+  const preview = new Image();
+  preview.onload = () => {
+    img.src = source;
+    img.alt = `${product.nome} — ${back ? "verso" : "frente"}`;
+    img.classList.remove("is-switching");
+  };
+  preview.onerror = () => {
+    img.src = oldSource;
+    img.alt = oldAlt;
+    img.classList.remove("is-switching");
+    buttons.forEach((item) => {
+      const active = item.dataset.side === (oldSource === product.verso ? "back" : "front");
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-pressed", String(active));
+    });
+    showToast("Foto indisponível. Confira o caminho do verso no script.js.");
+  };
+  preview.src = source;
+}
+
+document.addEventListener("click", (event) => {
+  const add = event.target.closest("[data-add-product]");
+  const quantity = event.target.closest("[data-quantity]");
+  const remove = event.target.closest("[data-remove-product]");
+  const side = event.target.closest("[data-side]");
+  if (add) addToCart(Number(add.dataset.addProduct));
+  if (quantity) changeQuantity(Number(quantity.dataset.productId), Number(quantity.dataset.quantity));
+  if (remove) {
+    delete state.cart[remove.dataset.removeProduct];
+    saveCart(); renderCart();
+  }
+  if (side) switchPhoto(side);
 });
 
-cartBody.addEventListener("click", event => {
-  const quantity = event.target.closest("[data-delta]");
-  const remove = event.target.closest("[data-remove]");
-  if (quantity) updateQuantity(quantity.dataset.id, Number(quantity.dataset.delta));
-  if (remove) removeFromCart(remove.dataset.remove);
+el.search.addEventListener("input", renderProducts);
+document.querySelectorAll("[data-open-cart]").forEach((button) => button.addEventListener("click", openCart));
+$("[data-close-cart]").addEventListener("click", closeCart);
+$("[data-cart-backdrop]").addEventListener("click", closeCart);
+el.checkout.addEventListener("click", checkoutWhatsApp);
+$("[data-clear-cart]").addEventListener("click", () => {
+  state.cart = {}; saveCart(); renderCart();
 });
 
-$("#openCart").addEventListener("click", openCart);
-$("#closeCart").addEventListener("click", closeCart);
-backdrop.addEventListener("click", closeCart);
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && document.body.classList.contains("cart-open")) closeCart();
+function closeMenu() {
+  el.body.classList.remove("menu-open");
+  el.menu.setAttribute("aria-expanded", "false");
+  el.mobileNav.setAttribute("aria-hidden", "true");
+}
+el.menu.addEventListener("click", () => {
+  const open = el.body.classList.toggle("menu-open");
+  el.menu.setAttribute("aria-expanded", String(open));
+  el.mobileNav.setAttribute("aria-hidden", String(!open));
+});
+el.mobileNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") { closeCart(); closeMenu(); }
+  if (event.key === "Tab" && el.body.classList.contains("cart-open")) {
+    const controls = [...el.cartDrawer.querySelectorAll("button:not(:disabled), a[href]")];
+    const first = controls[0]; const last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  }
 });
 
+window.addEventListener("scroll", () => el.header.classList.toggle("scrolled", window.scrollY > 24), { passive: true });
+$("[data-year]").textContent = new Date().getFullYear();
+$("[data-whatsapp-float]").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(CONFIG.mensagemWhatsApp)}`;
+$("[data-whatsapp-footer]").href = `https://wa.me/${CONFIG.whatsapp}`;
+if (/^55\d{11}$/.test(CONFIG.whatsapp)) {
+  const number = CONFIG.whatsapp;
+  $("[data-whatsapp-footer]").textContent = `+${number.slice(0, 2)} ${number.slice(2, 4)} ${number.slice(4, 9)}-${number.slice(9)}`;
+}
+setupVideos();
 renderProducts();
 renderCart();
+observeReveals();
+
+// A fita inicia em movimento e só para se a pessoa usar o controle.
+const announcementToggle = document.querySelector("[data-announcement-toggle]");
+if (announcementToggle) {
+  announcementToggle.addEventListener("click", () => {
+    const paused = announcementToggle.closest(".announcement-bar").classList.toggle("is-paused");
+    announcementToggle.setAttribute("aria-pressed", String(paused));
+    announcementToggle.setAttribute("aria-label", paused ? "Reproduzir a faixa de informações" : "Pausar a faixa de informações");
+    announcementToggle.title = paused ? "Retomar movimento" : "Pausar movimento";
+    announcementToggle.textContent = paused ? "▶" : "Ⅱ";
+  });
+}
+
+// Remoção da animação breve de entrada: não deixa camada invisível sobre os botões.
+const intro = document.querySelector("[data-intro]");
+if (intro) window.setTimeout(() => intro.remove(), 1250);

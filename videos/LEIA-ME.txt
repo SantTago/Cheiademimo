@@ -1,0 +1,14 @@
+VÍDEOS DO CARROSSEL — Cheia de Mimo Home
+
+Coloque seus arquivos aqui com os nomes EXATOS:
+Video1.mp4
+Video2.mp4
+Video3.mp4
+Video4.mp4
+
+Atenção: Video (sem acento), sem espaço, e extensão .mp4 em minúsculas.
+Os espaços para os 4 vídeos já aparecem no site com capas das fotos originais.
+Até você enviar cada MP4, o respectivo cartão ficará marcado "Em breve".
+Os títulos e as capas individuais podem ser alterados em script.js > const VIDEOS.
+Não foram incluídos vídeos fictícios neste pacote.
+Recomendação: MP4 H.264 + áudio AAC, formato vertical 9:16 e arquivos compactados.

@@ -1,54 +1,248 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Cheia de Mimo Home — detalhes que transformam encontros em memórias.">
-  <meta name="theme-color" content="#741a23">
-  <title>Cheia de Mimo Home</title>
-  <link rel="icon" href="./images/logo-cheia-de-mimo.png">
-  <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
-  <header class="site-header">
-    <a class="brand-link" href="#inicio" aria-label="Cheia de Mimo Home — início"><img src="./images/logo-cheia-de-mimo.png" alt="Cheia de Mimo Home" class="brand-logo"></a>
-    <nav class="main-nav" aria-label="Navegação principal"><a href="#produtos">Produtos</a><a href="#sobre">A marca</a></nav>
-    <button class="cart-trigger" id="openCart" type="button" aria-label="Abrir carrinho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1"></circle><circle cx="19" cy="20" r="1"></circle><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 8H7"></path></svg><span class="cart-label">Carrinho</span><span class="cart-count" id="cartCount">0</span></button>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#904515" />
+    <meta
+      name="description"
+      content="Cheia de Mimo Home — detalhes que transformam encontros em memórias. Escolha seus produtos e finalize pelo WhatsApp."
+    />
+    <title>Cheia de Mimo Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2250%22 fill=%22%23904515%22/><path d=%22M50 19C37 31 31 42 34 53c2 8 9 14 16 18 7-4 14-10 16-18 3-11-3-22-16-34Z%22 fill=%22none%22 stroke=%22%23f7f1e8%22 stroke-width=%224%22/><path d=%22M50 23v55M35 52h30%22 stroke=%22%23f7f1e8%22 stroke-width=%224%22 stroke-linecap=%22round%22/></svg>" />
+    <link rel="stylesheet" href="styles.css?v=4-faixa-corrigida" />
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
 
-  <main id="conteudo">
-    <section class="hero-section" id="inicio">
-      <div class="hero-copy"><p class="eyebrow">Mesa posta • afeto • memória</p><h1>Sua mesa também conta histórias.</h1><p class="hero-description">Peças que vestem a mesa com delicadeza e transformam encontros cotidianos em lembranças cheias de significado.</p><div class="hero-actions"><a href="#produtos" class="primary-cta static-button">Ver produtos →</a><a class="text-link" href="#sobre">Conheça nossa essência</a></div></div>
-      <div class="hero-visual"><div class="hero-image-frame"><img src="./images/colecao-folhagens.jpg" alt="Composição de mesa da coleção Folhagens" class="hero-image"></div><div class="hero-caption"><span>Coleção Folhagens</span><span>Detalhes que acolhem</span></div></div>
-    </section>
-    <section class="manifesto-strip"><span></span><p>Detalhes que transformam encontros em memórias.</p><span></span></section>
+    <!-- Abertura breve. A logo é o arquivo ORIGINAL do projeto. -->
+    <div class="brand-intro" aria-hidden="true" data-intro>
+      <div class="intro-inner">
+        <img src="assets/logo-cheia-de-mimo-original.png" alt="" width="210" height="118" />
+        <p>Um detalhe especial está chegando</p>
+        <div class="intro-progress"><span></span></div>
+      </div>
+    </div>
 
-    <section class="section products-section" id="produtos">
-      <div class="section-heading"><p class="eyebrow">Escolha seus detalhes</p><h2>Produtos em destaque</h2><p>Adicione suas peças favoritas ao carrinho e confira preço e disponibilidade de cada item.</p></div>
-      <div class="products-grid" id="productsGrid"></div>
-    </section>
+    <div class="announcement-bar" aria-label="Informações da loja em movimento">
+      <div class="announcement-track">
+        <div class="announcement-group">
+          <span>Jogos americanos que encantam sua mesa</span>
+          <span>Todos os modelos por R$ 29,90</span>
+          <span>Detalhes que transformam encontros em memórias</span>
+          <span>Monte sua sacola e finalize pelo WhatsApp</span>
+        </div>
+        <div class="announcement-group" aria-hidden="true">
+          <span>Jogos americanos que encantam sua mesa</span>
+          <span>Todos os modelos por R$ 29,90</span>
+          <span>Detalhes que transformam encontros em memórias</span>
+          <span>Monte sua sacola e finalize pelo WhatsApp</span>
+        </div>
+      </div>
+      <button class="announcement-toggle" type="button" data-announcement-toggle aria-label="Pausar a faixa de informações" aria-pressed="false" title="Pausar movimento">Ⅱ</button>
+    </div>
 
-    <section class="about-section" id="sobre">
-      <div class="about-image-cluster" aria-hidden="true"><img class="about-image-main" src="./images/bordado-salvia.jpg" alt=""><img class="about-image-detail" src="./images/bordado-marfim.jpg" alt=""></div>
-      <div class="about-copy"><p class="eyebrow">Quem é a Cheia de Mimo</p><h2>Beleza que acolhe. Detalhes que aproximam.</h2><p>A Cheia de Mimo Home transforma a mesa e o lar em espaços de acolhimento, afeto, beleza e fé. Cada composição valoriza o cuidado no acabamento e a delicadeza de receber bem.</p><p>Mais do que vestir a mesa, queremos inspirar pausas, conversas e memórias construídas ao redor dela.</p><a class="text-link text-link-light" href="#como-comprar">Veja como comprar →</a></div>
-    </section>
+    <header class="site-header" id="inicio">
+      <a class="brand" href="#inicio" aria-label="Cheia de Mimo Home — início">
+        <img src="assets/logo-cheia-de-mimo-original.png" alt="Cheia de Mimo Home" />
+      </a>
 
-    <section class="section how-section" id="como-comprar">
-      <div class="section-heading"><p class="eyebrow">Do desejo ao atendimento</p><h2>Como fazer seu pedido</h2><p>Um caminho simples para montar uma composição com a sua cara.</p></div>
-      <ol class="steps-grid"><li><span>01</span><h3>Escolha</h3><p>Navegue pelos produtos e selecione as peças.</p></li><li><span>02</span><h3>Revise o carrinho</h3><p>Ajuste as quantidades e confira os itens.</p></li><li><span>03</span><h3>Envie pelo WhatsApp</h3><p>Seu pedido segue organizado para o atendimento.</p></li></ol>
-    </section>
-  </main>
+      <nav class="desktop-nav" aria-label="Navegação principal">
+        <a href="#produtos">Produtos</a>
+        <a href="#videos" data-video-nav>Inspirações</a>
+        <a href="#marca">A marca</a>
+        <a href="#localizacao">Localização</a>
+        <a href="#como-comprar">Como comprar</a>
+      </nav>
 
-  <footer class="site-footer"><img src="./images/logo-cheia-de-mimo.png" alt="Cheia de Mimo Home"><p>Detalhes pensados para receber bem.</p><div><a href="#produtos">Produtos</a><a href="#sobre">A marca</a></div><small>Imperatriz — MA · Enviamos para todo o Brasil</small><small>© 2026 Cheia de Mimo Home</small></footer>
+      <div class="header-actions">
+        <button class="cart-trigger" type="button" data-open-cart aria-label="Abrir carrinho">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 13H5L6 8Zm3 0V6a3 3 0 0 1 6 0v2" /></svg>
+          <span class="cart-label">Sacola</span>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+        <button class="menu-trigger" type="button" aria-label="Abrir menu" aria-expanded="false">
+          <span></span><span></span>
+        </button>
+      </div>
 
-  <div class="cart-backdrop" id="cartBackdrop" hidden></div>
-  <aside class="cart-panel" id="cartPanel" aria-hidden="true">
-    <div class="cart-header static-cart-header"><div><p class="eyebrow">Sua seleção</p><h2>Meu carrinho</h2><p id="cartSubtitle">Escolha seus detalhes favoritos para começar.</p></div><button class="close-cart" id="closeCart" type="button" aria-label="Fechar carrinho">×</button></div>
-    <div class="cart-body" id="cartBody"></div>
-    <div class="cart-summary" id="cartSummary" hidden><div><span>Total de peças</span><strong id="cartTotal">0</strong></div><div><span>Valor dos produtos</span><strong id="cartValue">R$ 0,00</strong></div><p>Pagamento, prazo e entrega serão confirmados no atendimento.</p><a id="whatsappButton" class="whatsapp-button static-button" href="#" target="_blank" rel="noreferrer">Enviar pedido pelo WhatsApp</a></div>
-  </aside>
-  <div class="toast-message" id="toastMessage" role="status" aria-live="polite"></div>
-  <script src="./script.js"></script>
-</body>
+      <nav class="mobile-nav" aria-label="Navegação móvel" aria-hidden="true">
+        <a href="#produtos">Produtos</a>
+        <a href="#videos" data-video-nav>Inspirações</a>
+        <a href="#marca">A marca</a>
+        <a href="#localizacao">Localização</a>
+        <a href="#como-comprar">Como comprar</a>
+      </nav>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Cheia de Mimo Home</p>
+          <h1>Sua mesa também conta <em>histórias.</em></h1>
+          <p class="hero-text">
+            Jogos americanos que levam cor, delicadeza e afeto para os momentos ao redor da mesa.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#produtos">Explorar coleção <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#marca">Nossa essência <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="hero-highlights"><span>Peças a R$ 29,90</span><i aria-hidden="true"></i><span>Pedido pelo WhatsApp</span></div>
+        </div>
+
+        <div class="hero-visual reveal" data-delay="1">
+          <div class="hero-image-wrap">
+            <img src="produtos/Produto 1.jpg" alt="Jogos americanos Cheia de Mimo em composição de mesa" fetchpriority="high" />
+          </div>
+          <div class="hero-image-note"><span>01 / 22</span><span>Peças para momentos especiais</span></div>
+        </div>
+
+        <div class="scroll-cue" aria-hidden="true"><span></span>Role para descobrir</div>
+      </section>
+
+      <section class="manifesto reveal" aria-label="Manifesto">
+        <p>Detalhes que transformam</p>
+        <h2>encontros em memórias.</h2>
+      </section>
+
+      <section class="section products-section" id="produtos">
+        <div class="section-heading reveal">
+          <div>
+            <p class="eyebrow">Nossa seleção</p>
+            <h2>Encontre o seu <em>favorito.</em></h2>
+          </div>
+          <p class="section-intro">Explore os modelos, veja os detalhes e monte sua sacola com calma. Cada peça por R$ 29,90.</p>
+        </div>
+
+        <div class="catalog-toolbar">
+          <label class="catalog-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+            <span class="sr-only">Pesquisar produto</span>
+            <input type="search" placeholder="Buscar um modelo..." data-product-search autocomplete="off" />
+          </label>
+          <span class="catalog-count" data-products-count aria-live="polite">Carregando coleção…</span>
+        </div>
+        <div class="products-grid" data-products-grid>
+          <div class="loading-card">Carregando produtos…</div>
+        </div>
+      </section>
+
+      <section class="section video-section" id="videos" aria-label="Carrossel de vídeos de inspiração">
+        <div class="video-topline reveal"><span>CHEIA DE MIMO · EM MOVIMENTO</span><span>INSPIRAÇÕES PARA RECEBER BEM</span></div>
+        <div class="section-heading light reveal">
+
+          <div>
+            <p class="eyebrow">Veja de perto</p>
+            <h2>Detalhes que <em>ganham vida.</em></h2>
+            <p class="video-intro">Uma coleção de inspirações em vídeo para imaginar cada peça na sua mesa.</p>
+          </div>
+          
+          <div class="carousel-controls" role="group" aria-label="Navegação dos vídeos">
+            <button type="button" data-video-prev aria-label="Vídeo anterior">←</button>
+            <button type="button" data-video-next aria-label="Próximo vídeo">→</button>
+          </div>
+        </div>
+        <div class="video-carousel reveal" data-video-carousel aria-label="Vídeos; deslize para navegar" tabindex="0">
+          <div class="video-empty">Preparando inspirações…</div>
+        </div>
+        <div class="video-bottom">
+          <div class="video-pagination" data-video-dots role="group" aria-label="Escolher vídeo"></div>
+          <span class="video-indicator" data-video-indicator aria-live="polite">01 / 04</span>
+          <span class="video-swipe">Arraste para explorar <span aria-hidden="true">↗</span></span>
+        </div>
+      </section>
+
+      <section class="section story-section" id="marca">
+        <div class="story-photo reveal">
+          <img src="produtos/Produto 14.jpeg" alt="Jogo americano xadrez da Cheia de Mimo Home" loading="lazy" />
+          <div class="story-photo-caption">Um toque de mimo em cada detalhe.</div>
+        </div>
+        <div class="story-copy reveal" data-delay="1">
+          <p class="eyebrow">A marca</p>
+          <h2>A beleza mora nos gestos de cuidado.</h2>
+          <p>
+            A Cheia de Mimo Home transforma a mesa e o lar em espaços de acolhimento, afeto, beleza e fé. Cada detalhe nasce do desejo de inspirar pausas, conversas e memórias construídas em casa.
+          </p>
+          <p>
+            Mais do que compor uma mesa, queremos celebrar o prazer de receber bem — com delicadeza, intenção e significado.
+          </p>
+        </div>
+      </section>
+
+      <section class="section steps-section" id="como-comprar">
+        <div class="section-heading reveal">
+          <div>
+            <p class="eyebrow">Simples e pessoal</p>
+            <h2>Como comprar</h2>
+          </div>
+        </div>
+        <div class="steps-grid">
+          <article class="step reveal"><span>01</span><h3>Escolha</h3><p>Adicione seus produtos favoritos à sacola.</p></article>
+          <article class="step reveal" data-delay="1"><span>02</span><h3>Revise</h3><p>Ajuste as quantidades e confira seu pedido.</p></article>
+          <article class="step reveal" data-delay="2"><span>03</span><h3>Envie</h3><p>Finalize pelo WhatsApp para combinar entrega e pagamento.</p></article>
+        </div>
+      </section>
+
+      <section class="section location-section" id="localizacao" aria-label="Mapa de Imperatriz, Maranhão">
+        <div class="location-copy reveal">
+          <p class="eyebrow">Onde estamos no mapa</p>
+          <h2>Imperatriz, <em>Maranhão.</em></h2>
+          <p>Explore a cidade no mapa. Para confirmar o endereço de atendimento, retirada ou entrega, fale com a nossa equipe pelo WhatsApp.</p>
+          <a class="location-link" href="https://www.openstreetmap.org/?mlat=-5.5269&amp;mlon=-47.4781#map=13/-5.5269/-47.4781" target="_blank" rel="noopener noreferrer">Abrir mapa completo <span aria-hidden="true">↗</span></a>
+          <p class="location-disclaimer">O marcador indica a cidade de Imperatriz, não o endereço exato da loja.</p>
+        </div>
+        <div class="location-map-shell reveal" data-delay="1">
+          <div class="map-label"><span class="map-label-dot" aria-hidden="true"></span> IMPERATRIZ · MA</div>
+          <iframe title="Mapa interativo da cidade de Imperatriz no Maranhão" src="https://www.openstreetmap.org/export/embed.html?bbox=-47.515%2C-5.555%2C-47.440%2C-5.497&amp;layer=mapnik&amp;marker=-5.5269%2C-47.4781" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          <div class="map-footer"><span>Explore a cidade</span><span>OpenStreetMap © colaboradores</span></div>
+        </div>
+      </section>
+
+      <section class="closing-section reveal">
+        <p class="eyebrow">Cheia de Mimo Home</p>
+        <h2>Vamos criar uma mesa cheia de significado?</h2>
+        <a class="button button-light" href="#produtos">Escolher produtos</a>
+      </section>
+    </main>
+
+    <a class="whatsapp-float" data-whatsapp-float href="https://wa.me/5591991143369?text=Ol%C3%A1%21%20Gostaria%20de%20conhecer%20os%20produtos%20da%20Cheia%20de%20Mimo%20Home." target="_blank" rel="noopener noreferrer" aria-label="Conversar com Cheia de Mimo no WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.5 0 .2 5.3.2 11.9c0 2.1.6 4.2 1.6 6L0 24l6.3-1.7c1.8 1 3.8 1.5 5.8 1.5 6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.5-8.4Zm-8.4 18.3c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4a9.8 9.8 0 1 1 8.5 4.6Zm5.4-7.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.5-.3-.5.3-.5.8-1.7.1-.2 0-.4 0-.6l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.5 3.8 6 5.3.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.2-.3-.3-.6-.4Z"/></svg>
+      <span>Fale conosco</span>
+    </a>
+
+    <footer>
+      <img src="assets/logo-cheia-de-mimo-original.png" alt="Cheia de Mimo Home" />
+      <p>Detalhes que transformam momentos.</p>
+      <span class="footer-location">Imperatriz · Maranhão</span>
+      <a href="https://wa.me/5591991143369" data-whatsapp-footer target="_blank" rel="noopener noreferrer">+55 91 99114-3369</a>
+      <small>© <span data-year></span> Cheia de Mimo Home</small>
+    </footer>
+
+    <div class="cart-backdrop" data-cart-backdrop></div>
+    <aside class="cart-drawer" data-cart-drawer role="dialog" aria-modal="true" aria-hidden="true" aria-label="Sua sacola" inert>
+      <div class="cart-header">
+        <div><p class="eyebrow">Seu pedido</p><h2>Sua sacola</h2></div>
+        <button type="button" data-close-cart aria-label="Fechar carrinho">×</button>
+      </div>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-footer">
+        <div class="cart-total"><span>Subtotal</span><strong data-cart-total>R$ 0,00</strong></div>
+        <p>Entrega e pagamento serão combinados pelo WhatsApp.</p>
+        <button class="button whatsapp-button" type="button" data-checkout>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.5 0 .2 5.3.2 11.9c0 2.1.6 4.2 1.6 6L0 24l6.3-1.7c1.8 1 3.8 1.5 5.8 1.5 6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.5-8.4Zm-8.4 18.3c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4a9.8 9.8 0 1 1 8.5 4.6Zm5.4-7.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.5-.3-.5.3-.5.8-1.7.1-.2 0-.4 0-.6l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.5 3.8 6 5.3.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.2-.3-.3-.6-.4Z" /></svg>
+          Enviar pedido pelo WhatsApp
+        </button>
+        <button class="clear-cart" type="button" data-clear-cart>Limpar sacola</button>
+      </div>
+    </aside>
+
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+    <script src="script.js?v=4-faixa-corrigida" defer></script>
+  </body>
 </html>
