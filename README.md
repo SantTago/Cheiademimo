@@ -1,3 +1,28 @@
+## Ajuste do banner e das fotos — 29/09/2026
+
+- Banner retangular sem oval, mantendo a largura e a proporção anteriores em computador e celular.
+- Cinco fotos originais se alternam a cada 4,5 segundos, com seleção de foto e controle de pausa.
+- A troca pausa ao passar o mouse, navegar pelos controles ou sair da aba. Movimento reduzido é respeitado.
+- Fotos do courino na proporção original, com altura natural, sem faixas laterais nem ampliação ao passar o mouse.
+- As fotos fornecidas já são verticais e algumas mostram o produto em close. Nenhum trecho adicional foi cortado ou inventado.
+- Os demais produtos, preços, vídeos, logo e dados de contato desta versão enviada foram preservados.
+
+# Atualização do site — 29/09/2026
+
+- Os 13 produtos já cadastrados foram preservados, com preço de R$ 29,00.
+- Nova seção de jogos americanos em courino: 5 cores, R$ 18,00 a unidade. Fotos de detalhe ficam no botão Detalhe.
+- Nova seção de porta-guardanapos: 8 modelos, R$ 11,99 a unidade. As fotos mostram composições; o valor é por unidade do modelo selecionado.
+- Logo recuperada do arquivo logo-cheia-de-mimo-home-alta-resolucao.png, mantida sem redesenho.
+- Sete vídeos cadastrados: cinco do site e dois da pasta de porta-guardanapos. As duas primeiras capas foram preservadas; as outras são o primeiro quadro do respectivo vídeo.
+- Para vídeos futuros, deixe capa: "" para capturar o primeiro quadro automaticamente. Para esse recurso, sirva o site por HTTP/HTTPS com o vídeo no mesmo domínio.
+- As fotos HEIC e os vídeos MOV foram convertidos em JPEG e MP4 compatíveis com navegadores.
+- Botão do WhatsApp com acabamento em verde escuro e acesso visível no celular.
+
+## Publicação
+Extraia este ZIP e envie o conteúdo da pasta para a hospedagem existente, substituindo os arquivos anteriores e incluindo assets/, produtos/ e videos/. O número de WhatsApp existente foi mantido. Esta entrega não altera automaticamente o site que já está no ar.
+
+---
+
 # Cheia de Mimo Home — vitrine premium para GitHub Pages
 
 Site em HTML, CSS e JavaScript puro, sem instalação, compilação ou banco de dados. Inclui a logo **original**, as **22 fotografias originais**, catálogo manual, busca de produtos, sacola de compras, opção de frente/verso e pedido pelo WhatsApp. Mantém a identidade em creme, terracota, marrom e verde-sálvia.
@@ -14,7 +39,7 @@ Exemplo de produto de frente e verso:
   nome: "Jogo Americano Floral",     // Nome exibido na loja e no pedido
   categoria: "Jogo americano",
   descricao: "Impermeável • Disponibilidade sob consulta",
-  preco: 29.90,                      // Preço deste produto, com ponto decimal
+  preco: 29.00,                      // Preço deste produto, com ponto decimal
   frente: "produtos/floral-frente.jpg", // Foto principal (obrigatória)
   verso: "produtos/floral-verso.jpg",   // Foto secundária (opcional)
   exibirVerso: true,                 // Habilita o botão para trocar a foto
@@ -46,7 +71,7 @@ Os botões **Frente** e **Verso** aparecem somente quando `exibirVerso` estiver 
 
 Você pode usar caminhos relativos, como `produtos/nome.jpg`, ou links completos `https://...` (se o provedor de imagens permitir o uso no site). Evite renomear arquivos já cadastrados sem atualizar seu caminho; maiúsculas e minúsculas fazem diferença no GitHub Pages. Formatos de foto recomendados: JPG, PNG ou WebP. Para fotos nítidas e leves, use aproximadamente 1200 px no maior lado e comprima antes de publicar. **Não é necessário remover ou modificar as fotos originais.**
 
-**Atenção ao preço:** a sacola e a mensagem para o WhatsApp usam o preço individual de cada produto. As frases promocionais de R$ 29,90 no banner, na abertura e na introdução do catálogo são textos fixos em `index.html`. Se os valores deixarem de ser iguais, atualize esses textos para não anunciar um preço incorreto.
+**Atenção ao preço:** a sacola e a mensagem para o WhatsApp usam o preço individual de cada produto. Os títulos das seções, em `script.js`, e os destaques em `index.html` são textos fixos. Se os valores deixarem de ser iguais, atualize esses textos para não anunciar um preço incorreto.
 
 ## 2. Número do WhatsApp
 

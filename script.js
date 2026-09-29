@@ -21,7 +21,7 @@ const CONFIG = {
      nome: "Nome do seu produto",
      categoria: "Jogo americano",
      descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-     preco: 29.90,
+     preco: 29.00,
      frente: "produtos/minha-foto-frente.jpg",
      verso: "produtos/minha-foto-verso.jpg",
      exibirVerso: true,
@@ -37,7 +37,7 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 01",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 2.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 2 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
@@ -48,7 +48,7 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 02",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 3.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 3 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
@@ -59,7 +59,7 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 03",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 4.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 4 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
@@ -70,7 +70,7 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 04",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 5.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 5 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
@@ -81,7 +81,7 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 05",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 6.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 6 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
@@ -92,10 +92,10 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 06",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 7.jpeg",
     verso: "produtos/Produto 8.jpeg",                 // Opcional: "produtos/Produto 7 - Verso.jpg"
-    exibirVerso: true,         // Mude para true para liberar a troca de foto
+    exibirVerso: false,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
  
@@ -104,32 +104,22 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 08",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 9.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 9 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
-  {
-    id: 10,
-    nome: "Jogo Americano — Modelo 09",
-    categoria: "Jogo americano",
-    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
-    frente: "produtos/Produto 10.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 10 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
-    ativo: true,
-  },
+  
   {
     id: 11,
     nome: "Jogo Americano — Modelo 10",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 11.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 11 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    verso: "produtos/Produto 19.jpeg",                 // Opcional: "produtos/Produto 11 - Verso.jpg"
+    exibirVerso: true,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
   {
@@ -137,96 +127,45 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 11",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 12.jpeg",
     verso: "",                 // Opcional: "produtos/Produto 12 - Verso.jpg"
     exibirVerso: false,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
-  {
-    id: 13,
-    nome: "Jogo Americano — Modelo 12",
-    categoria: "Jogo americano",
-    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
-    frente: "produtos/Produto 13.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 13 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
-    ativo: true,
-  },
+ 
   {
     id: 14,
     nome: "Jogo Americano — Modelo 13",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 14.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 14 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    verso: "produtos/Produto 15.jpeg",                 // Opcional: "produtos/Produto 14 - Verso.jpg"
+    exibirVerso: true,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
-  {
-    id: 15,
-    nome: "Jogo Americano — Modelo 14",
-    categoria: "Jogo americano",
-    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
-    frente: "produtos/Produto 15.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 15 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
-    ativo: true,
-  },
-  {
-    id: 16,
-    nome: "Jogo Americano — Modelo 15",
-    categoria: "Jogo americano",
-    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
-    frente: "produtos/Produto 16.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 16 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
-    ativo: true,
-  },
+ 
   {
     id: 17,
     nome: "Jogo Americano — Modelo 17",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 17.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 17 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    verso: "produtos/Produto 16.jpeg",                 // Opcional: "produtos/Produto 17 - Verso.jpg"
+    exibirVerso: true,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
-  {
-    id: 18,
-    nome: "Jogo Americano — Modelo 18",
-    categoria: "Jogo americano",
-    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
-    frente: "produtos/Produto 18.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 18 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
-    ativo: true,
-  },
-  {
-    id: 19,
-    nome: "Jogo Americano — Modelo 19",
-    categoria: "Jogo americano",
-    descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
-    frente: "produtos/Produto 19.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 19 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
-    ativo: true,
-  },
+
+  
 
   {
     id: 21,
     nome: "Jogo Americano — Modelo 21",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 21.jpeg",
     verso: "produtos/Produto 20.jpeg",                 // Opcional: "produtos/Produto 21 - Verso.jpg"
     exibirVerso: true,         // Mude para true para liberar a troca de foto
@@ -237,12 +176,25 @@ const PRODUTOS = [
     nome: "Jogo Americano — Modelo 22",
     categoria: "Jogo americano",
     descricao: "Jogo americano impermeável • Disponibilidade sob consulta",
-    preco: 29.90,
+    preco: 29.00,
     frente: "produtos/Produto 22.jpeg",
-    verso: "",                 // Opcional: "produtos/Produto 22 - Verso.jpg"
-    exibirVerso: false,         // Mude para true para liberar a troca de foto
+    verso: "produtos/Produto 18.jpeg",                 // Opcional: "produtos/Produto 22 - Verso.jpg"
+    exibirVerso: true,         // Mude para true para liberar a troca de foto
     ativo: true,
   },
+{"id": 23, "nome": "Jogo Americano Courino — Azul", "categoria": "Jogos americanos em courino", "descricao": "Impermeável, tipo courino e fácil de limpar. Valor por unidade.", "preco": 18, "frente": "produtos/novos/courino-02.jpg", "verso": "produtos/novos/courino-08.jpg", "exibirVerso": true, "detalhe": true, "ativo": true},
+{"id": 24, "nome": "Jogo Americano Courino — Marrom", "categoria": "Jogos americanos em courino", "descricao": "Impermeável, tipo courino e fácil de limpar. Valor por unidade.", "preco": 18, "frente": "produtos/novos/courino-03.jpg", "verso": "produtos/novos/courino-10.jpg", "exibirVerso": true, "detalhe": true, "ativo": true},
+{"id": 25, "nome": "Jogo Americano Courino — Verde", "categoria": "Jogos americanos em courino", "descricao": "Impermeável, tipo courino e fácil de limpar. Valor por unidade.", "preco": 18, "frente": "produtos/novos/courino-04.jpg", "verso": "produtos/novos/courino-07.jpg", "exibirVerso": true, "detalhe": true, "ativo": true},
+{"id": 26, "nome": "Jogo Americano Courino — Vinho", "categoria": "Jogos americanos em courino", "descricao": "Impermeável, tipo courino e fácil de limpar. Valor por unidade.", "preco": 18, "frente": "produtos/novos/courino-05.jpg", "verso": "produtos/novos/courino-09.jpg", "exibirVerso": true, "detalhe": true, "ativo": true},
+{"id": 27, "nome": "Jogo Americano Courino — Claro", "categoria": "Jogos americanos em courino", "descricao": "Impermeável, tipo courino e fácil de limpar. Valor por unidade.", "preco": 18, "frente": "produtos/novos/courino-06.jpg", "verso": "produtos/novos/courino-11.jpg", "exibirVerso": true, "detalhe": true, "ativo": true},
+{"id": 28, "nome": "Porta-guardanapo — Banana", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo banana. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-02.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 29, "nome": "Porta-guardanapo — Maçã", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo maçã. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-02.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 30, "nome": "Porta-guardanapo — Morango", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo morango. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-01.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 31, "nome": "Porta-guardanapo — Mamão", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo mamão. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-01.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 32, "nome": "Porta-guardanapo — Ovo", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo ovo. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-03.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 33, "nome": "Porta-guardanapo — Pão", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo pão. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-04.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 34, "nome": "Porta-guardanapo — Croissant", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo croissant. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-05.jpg", "verso": "", "exibirVerso": false, "ativo": true},
+{"id": 35, "nome": "Porta-guardanapo — Pipoca", "categoria": "Porta-guardanapos", "descricao": "Valor por unidade do modelo pipoca. Outros modelos da foto vendidos separadamente.", "preco": 11.99, "frente": "produtos/novos/porta-guardanapo-06.jpg", "verso": "", "exibirVerso": false, "ativo": true}
  ];
 
 /* CARROSSEL DE VÍDEOS: nomes SEM espaço e SEM acento, exatos no GitHub Pages.
@@ -254,8 +206,11 @@ const PRODUTOS = [
 const VIDEOS = [
   { titulo: " ", arquivo: "videos/Video1.mp4", capa: "produtos/capa2.jpeg", ativo: true },
   { titulo: " ", arquivo: "videos/Video2.mp4", capa: "produtos/capa1.jpeg", ativo: true },
-  { titulo: " ", arquivo: "videos/Video3.mp4", capa: "produtos/Produto 9.jpeg", ativo: true },
-  { titulo: " ", arquivo: "videos/Video4.mp4", capa: "produtos/Produto 21.jpeg", ativo: true },
+  { titulo: " ", arquivo: "videos/Video3.mp4", capa: "videos/capa-video-3.jpg", ativo: true },
+  { titulo: " ", arquivo: "videos/Video4.mp4", capa: "videos/capa-video-4.jpg", ativo: true },
+  { titulo: "Inspiração à mesa", arquivo: "videos/Video5.mp4", capa: "videos/capa-video-5.jpg", ativo: true },
+  { titulo: "Porta-guardanapos de perto", arquivo: "videos/Video6.mp4", capa: "videos/capa-video-6.jpg", ativo: true },
+  { titulo: "Detalhes para encantar", arquivo: "videos/Video7.mp4", capa: "videos/capa-video-7.jpg", ativo: true },
 ];
 
 /* ========================================================================
@@ -318,7 +273,7 @@ function renderProducts() {
     return;
   }
 
-  el.grid.innerHTML = shown.map((product, index) => {
+  const cardsHtml = (products) => products.map((product, index) => {
     const hasBack = Boolean(product.exibirVerso && String(product.verso || "").trim());
     return `
       <article class="product-card reveal" data-delay="${index % 3}">
@@ -328,8 +283,8 @@ function renderProducts() {
         </div>
         <div class="product-content">
           ${hasBack ? `<div class="side-switcher" role="group" aria-label="Ver fotos de ${escapeHtml(product.nome)}">
-            <button type="button" class="active" data-side="front" data-product-id="${product.id}" aria-pressed="true">Frente</button>
-            <button type="button" data-side="back" data-product-id="${product.id}" aria-pressed="false">Verso</button>
+            <button type="button" class="active" data-side="front" data-product-id="${product.id}" aria-pressed="true">${product.detalhe ? "Foto" : "Frente"}</button>
+            <button type="button" data-side="back" data-product-id="${product.id}" aria-pressed="false">${product.detalhe ? "Detalhe" : "Verso"}</button>
           </div>` : `<span class="product-kicker">${escapeHtml(product.categoria)}</span>`}
           <h3 class="product-name">${escapeHtml(product.nome)}</h3>
           <p class="product-description">${escapeHtml(product.descricao)}</p>
@@ -339,6 +294,19 @@ function renderProducts() {
           </div>
         </div>
       </article>`;
+  }).join("");
+  const sections = [
+    { category: "Jogo americano", id: "colecao-original", title: "Jogos americanos", description: "As estampas que você já ama. R$ 29,00 por unidade." },
+    { category: "Jogos americanos em courino", id: "colecao-courino", title: "Jogos americanos em courino", description: "Impermeáveis e fáceis de limpar. R$ 18,00 por unidade." },
+    { category: "Porta-guardanapos", id: "colecao-porta-guardanapos", title: "Porta-guardanapos", description: "Pequenos detalhes para completar sua mesa. R$ 11,99 por unidade." },
+  ];
+  el.grid.innerHTML = sections.map((section) => {
+    const products = shown.filter((product) => product.categoria === section.category);
+    if (!products.length) return "";
+    return `<section class="catalog-group" id="${section.id}" aria-labelledby="${section.id}-title">
+      <header class="catalog-group-heading"><div><h3 id="${section.id}-title">${section.title}</h3><p>${section.description}</p></div><span>${products.length} modelos</span></header>
+      ${section.id === "colecao-courino" && !term ? `<div class="collection-overview"><img src="produtos/novos/courino-01.jpg" alt="Cores da coleção courino" loading="lazy"><img src="produtos/novos/courino-12.jpg" alt="Jogos americanos courino em diferentes cores" loading="lazy"><p>Cores para combinar.<br><em>Praticidade para todos os dias.</em></p></div>` : ""}
+      <div class="products-grid">${cardsHtml(products)}</div></section>`;
   }).join("");
   observeReveals();
 }
@@ -357,8 +325,8 @@ function setupVideos() {
   }
   carousel.innerHTML = enabled.map((video, index) => `
     <article class="video-card" data-video-card>
-      <div class="video-poster"><img class="video-poster-blur" src="${escapeHtml(video.capa)}" alt="" aria-hidden="true" loading="lazy" decoding="async" /><img class="video-poster-art" src="${escapeHtml(video.capa)}" alt="" loading="lazy" decoding="async" /></div>
-      <video hidden preload="metadata" playsinline controls poster="${escapeHtml(video.capa)}" aria-label="${escapeHtml(video.titulo)}">
+      <div class="video-poster"><img class="video-poster-blur" ${video.capa ? `src="${escapeHtml(video.capa)}"` : ""} alt="" aria-hidden="true" loading="lazy" decoding="async" /><img class="video-poster-art" ${video.capa ? `src="${escapeHtml(video.capa)}"` : ""} alt="" loading="lazy" decoding="async" /></div>
+      <video hidden preload="metadata" playsinline controls ${video.capa ? `poster="${escapeHtml(video.capa)}"` : ""} aria-label="${escapeHtml(video.titulo)}">
         <source src="${escapeHtml(video.arquivo)}" type="video/mp4" />
       </video>
       <div class="video-overlay">
@@ -416,6 +384,19 @@ function setupVideos() {
       card.classList.add("video-missing");
       button.hidden = true; video.hidden = true;
     };
+    if (!enabled[cards.indexOf(card)].capa) {
+      video.preload = "auto";
+      video.addEventListener("loadeddata", () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+          canvas.getContext("2d").drawImage(video, 0, 0);
+          const cover = canvas.toDataURL("image/jpeg", 0.85);
+          video.poster = cover;
+          card.querySelectorAll(".video-poster img").forEach((img) => { img.src = cover; });
+        } catch { /* A reprodução permanece disponível se a captura falhar. */ }
+      }, { once: true });
+    }
     video.addEventListener("loadedmetadata", available);
     video.addEventListener("error", missing);
     // source filho pode emitir erro separado do elemento <video>.
@@ -564,7 +545,7 @@ function switchPhoto(button) {
   const preview = new Image();
   preview.onload = () => {
     img.src = source;
-    img.alt = `${product.nome} — ${back ? "verso" : "frente"}`;
+    img.alt = `${product.nome} — ${product.detalhe ? (back ? "detalhe" : "foto") : (back ? "verso" : "frente")}`;
     img.classList.remove("is-switching");
   };
   preview.onerror = () => {
@@ -654,3 +635,48 @@ if (announcementToggle) {
 // Remoção da animação breve de entrada: não deixa camada invisível sobre os botões.
 const intro = document.querySelector("[data-intro]");
 if (intro) window.setTimeout(() => intro.remove(), 1250);
+
+
+// Fotos do banner: preserva o espaço da imagem e respeita movimento reduzido.
+function setupHeroSlideshow() {
+  const carousel = document.querySelector("[data-hero-slideshow]");
+  if (!carousel) return;
+  const slides = [...carousel.querySelectorAll(".hero-slide")];
+  const dots = [...carousel.querySelectorAll("[data-hero-slide]")];
+  const toggle = carousel.querySelector("[data-hero-toggle]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let current = 0;
+  let paused = reducedMotion.matches;
+  let hovering = false;
+  let focused = false;
+  let timer;
+  function show(index) {
+    current = (index + slides.length) % slides.length;
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("is-active", i === current);
+      slide.setAttribute("aria-hidden", String(i !== current));
+    });
+    dots.forEach((dot, i) => dot.setAttribute("aria-current", String(i === current)));
+  }
+  function schedule() {
+    window.clearInterval(timer);
+    toggle.textContent = paused ? "Reproduzir" : "Pausar";
+    toggle.setAttribute("aria-label", paused ? "Iniciar troca de fotos" : "Pausar troca de fotos");
+    if (!paused && !hovering && !focused && !document.hidden) {
+      timer = window.setInterval(() => show(current + 1), 4500);
+    }
+  }
+  dots.forEach((dot, index) => dot.addEventListener("click", () => { show(index); schedule(); }));
+  toggle.addEventListener("click", () => { paused = !paused; schedule(); });
+  carousel.addEventListener("mouseenter", () => { hovering = true; schedule(); });
+  carousel.addEventListener("mouseleave", () => { hovering = false; schedule(); });
+  carousel.addEventListener("focusin", () => { focused = true; schedule(); });
+  carousel.addEventListener("focusout", (event) => {
+    if (!carousel.contains(event.relatedTarget)) { focused = false; schedule(); }
+  });
+  document.addEventListener("visibilitychange", schedule);
+  reducedMotion.addEventListener("change", () => { paused = reducedMotion.matches; schedule(); });
+  show(0);
+  schedule();
+}
+setupHeroSlideshow();

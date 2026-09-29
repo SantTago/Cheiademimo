@@ -16,7 +16,7 @@
       rel="stylesheet"
     />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2250%22 fill=%22%23904515%22/><path d=%22M50 19C37 31 31 42 34 53c2 8 9 14 16 18 7-4 14-10 16-18 3-11-3-22-16-34Z%22 fill=%22none%22 stroke=%22%23f7f1e8%22 stroke-width=%224%22/><path d=%22M50 23v55M35 52h30%22 stroke=%22%23f7f1e8%22 stroke-width=%224%22 stroke-linecap=%22round%22/></svg>" />
-    <link rel="stylesheet" href="styles.css?v=4-faixa-corrigida" />
+    <link rel="stylesheet" href="styles.css?v=6-banner-enquadramento" />
   </head>
   <body>
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -34,13 +34,13 @@
       <div class="announcement-track">
         <div class="announcement-group">
           <span>Jogos americanos que encantam sua mesa</span>
-          <span>Todos os modelos por R$ 29,90</span>
+          <span>Coleção de jogos americanos por R$ 29,00</span>
           <span>Detalhes que transformam encontros em memórias</span>
           <span>Monte sua sacola e finalize pelo WhatsApp</span>
         </div>
         <div class="announcement-group" aria-hidden="true">
           <span>Jogos americanos que encantam sua mesa</span>
-          <span>Todos os modelos por R$ 29,90</span>
+          <span>Coleção de jogos americanos por R$ 29,00</span>
           <span>Detalhes que transformam encontros em memórias</span>
           <span>Monte sua sacola e finalize pelo WhatsApp</span>
         </div>
@@ -93,14 +93,28 @@
             <a class="button button-primary" href="#produtos">Explorar coleção <span aria-hidden="true">↗</span></a>
             <a class="text-link" href="#marca">Nossa essência <span aria-hidden="true">→</span></a>
           </div>
-          <div class="hero-highlights"><span>Peças a R$ 29,90</span><i aria-hidden="true"></i><span>Pedido pelo WhatsApp</span></div>
+          <div class="hero-highlights"><span>Peças a R$ 29,00</span><i aria-hidden="true"></i><span>Pedido pelo WhatsApp</span></div>
         </div>
 
         <div class="hero-visual reveal" data-delay="1">
-          <div class="hero-image-wrap">
-            <img src="produtos/Produto 1.jpg" alt="Jogos americanos Cheia de Mimo em composição de mesa" fetchpriority="high" />
+          <div class="hero-image-wrap hero-slideshow" data-hero-slideshow role="region" aria-roledescription="carrossel" aria-label="Produtos Cheia de Mimo Home">
+            <img class="hero-slide is-active" src="produtos/Produto 1.jpg" alt="Jogos americanos Cheia de Mimo em composição de mesa" fetchpriority="high" aria-hidden="false" />
+            <img class="hero-slide" src="produtos/Produto 11.jpeg" alt="Jogo americano da coleção Cheia de Mimo" loading="lazy" aria-hidden="true" />
+            <img class="hero-slide" src="produtos/Produto 14.jpeg" alt="Jogo americano xadrez" loading="lazy" aria-hidden="true" />
+            <img class="hero-slide" src="produtos/Produto 17.jpeg" alt="Outra estampa da coleção de jogos americanos" loading="lazy" aria-hidden="true" />
+            <img class="hero-slide" src="produtos/Produto 21.jpeg" alt="Detalhes de mais um jogo americano da coleção" loading="lazy" aria-hidden="true" />
+            <div class="hero-slide-controls">
+              <div class="hero-slide-dots" role="group" aria-label="Escolher foto">
+                <button type="button" data-hero-slide="0" aria-label="Ver foto 1" aria-current="true"></button>
+                <button type="button" data-hero-slide="1" aria-label="Ver foto 2" aria-current="false"></button>
+                <button type="button" data-hero-slide="2" aria-label="Ver foto 3" aria-current="false"></button>
+                <button type="button" data-hero-slide="3" aria-label="Ver foto 4" aria-current="false"></button>
+                <button type="button" data-hero-slide="4" aria-label="Ver foto 5" aria-current="false"></button>
+              </div>
+              <button class="hero-slide-toggle" type="button" data-hero-toggle aria-label="Pausar troca de fotos">Pausar</button>
+            </div>
           </div>
-          <div class="hero-image-note"><span>01 / 22</span><span>Peças para momentos especiais</span></div>
+          <div class="hero-image-note"><span>CHEIA DE MIMO HOME</span><span>Peças para momentos especiais</span></div>
         </div>
 
         <div class="scroll-cue" aria-hidden="true"><span></span>Role para descobrir</div>
@@ -117,9 +131,14 @@
             <p class="eyebrow">Nossa seleção</p>
             <h2>Encontre o seu <em>favorito.</em></h2>
           </div>
-          <p class="section-intro">Explore os modelos, veja os detalhes e monte sua sacola com calma. Cada peça por R$ 29,90.</p>
+          <p class="section-intro">Explore os modelos, veja os detalhes e monte sua sacola com calma. Jogos americanos e porta-guardanapos para compor a sua mesa.</p>
         </div>
 
+        <nav class="collection-nav" aria-label="Coleções de produtos">
+          <a href="#colecao-original">Jogos americanos</a>
+          <a href="#colecao-courino">Courino · R$ 18</a>
+          <a href="#colecao-porta-guardanapos">Porta-guardanapos</a>
+        </nav>
         <div class="catalog-toolbar">
           <label class="catalog-search">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
@@ -128,7 +147,7 @@
           </label>
           <span class="catalog-count" data-products-count aria-live="polite">Carregando coleção…</span>
         </div>
-        <div class="products-grid" data-products-grid>
+        <div class="catalog-groups" data-products-grid>
           <div class="loading-card">Carregando produtos…</div>
         </div>
       </section>
@@ -243,6 +262,6 @@
     </aside>
 
     <div class="toast" data-toast role="status" aria-live="polite"></div>
-    <script src="script.js?v=4-faixa-corrigida" defer></script>
+    <script src="script.js?v=6-banner-enquadramento" defer></script>
   </body>
 </html>
