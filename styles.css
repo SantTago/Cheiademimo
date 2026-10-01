@@ -738,3 +738,129 @@ footer img { width:165px; height:75px; }
  #colecao-courino .collection-overview img { width:calc(50% - 6px); height:auto; }
 }
 @media(prefers-reduced-motion:reduce) { .hero-slideshow .hero-slide { transition:none; } }
+
+/* ========================================================================
+   CAMPANHA DE LANÇAMENTO
+   Ativada exclusivamente pela chave CONFIG.promocao.ativa em script.js.
+========================================================================= */
+[hidden] { display:none !important; }
+body.launch-open { overflow:hidden; }
+
+.launch-experience {
+  position:fixed;
+  inset:0;
+  z-index:300;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  padding:32px;
+  color:#fff9f2;
+  background:
+    radial-gradient(circle at 17% 13%, rgba(238,205,165,.24), transparent 28%),
+    radial-gradient(circle at 84% 83%, rgba(123,137,112,.22), transparent 31%),
+    linear-gradient(145deg,#3b2922 0%,#6f310f 52%,#904515 100%);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .42s ease,visibility .42s ease;
+}
+.launch-experience.is-visible { opacity:1; visibility:visible; }
+.launch-atmosphere { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.launch-atmosphere span { position:absolute; display:block; border:1px solid rgba(255,249,242,.18); border-radius:50%; }
+.launch-atmosphere span:nth-child(1) { width:54vw; height:54vw; min-width:520px; min-height:520px; left:-22vw; top:-31vw; }
+.launch-atmosphere span:nth-child(2) { width:38vw; height:38vw; min-width:420px; min-height:420px; right:-16vw; bottom:-22vw; }
+.launch-atmosphere span:nth-child(3) { width:190px; height:310px; right:9%; top:8%; border-radius:50% 50% 12px 12px; transform:rotate(26deg); }
+.launch-close { position:absolute; top:24px; right:25px; z-index:2; width:48px; height:48px; border:1px solid rgba(255,249,242,.34); border-radius:50%; color:#fff9f2; background:rgba(255,255,255,.06); font-size:28px; line-height:1; cursor:pointer; transition:background .2s,transform .2s; }
+.launch-close:hover { background:rgba(255,255,255,.15); transform:rotate(4deg); }
+.launch-content { position:relative; z-index:1; width:min(760px,100%); display:grid; justify-items:center; text-align:center; }
+.launch-content > img { width:176px; height:94px; object-fit:contain; filter:brightness(0) invert(1); opacity:.94; }
+.launch-kicker { margin:25px 0 15px; font-size:10px; font-weight:600; letter-spacing:.27em; text-transform:uppercase; color:#efd1ad; }
+.launch-content h2 { max-width:700px; margin:0; font:500 clamp(46px,7vw,82px)/.91 var(--serif); letter-spacing:-.035em; }
+.launch-content h2 em { display:block; color:#efd1ad; font-weight:400; }
+.launch-offer { margin:29px 0 27px; display:flex; align-items:center; gap:17px; }
+.launch-offer strong { font:500 clamp(54px,7vw,82px)/.78 var(--serif); color:#fff; }
+.launch-offer > span { padding-left:17px; border-left:1px solid rgba(255,249,242,.33); text-align:left; font-size:11px; font-weight:600; line-height:1.45; letter-spacing:.12em; text-transform:uppercase; }
+.launch-countdown { display:flex; align-items:center; justify-content:center; gap:13px; }
+.launch-countdown > div { width:72px; padding:13px 7px 10px; border:1px solid rgba(255,249,242,.25); border-radius:8px; background:rgba(255,255,255,.07); backdrop-filter:blur(8px); }
+.launch-countdown strong { display:block; font:500 29px/1 var(--serif); }
+.launch-countdown span { display:block; margin-top:6px; font-size:7px; letter-spacing:.15em; text-transform:uppercase; color:#efd1ad; }
+.launch-countdown i { font:400 22px/1 var(--serif); opacity:.58; }
+.launch-button { margin-top:28px; color:#70330e; background:#fff9f2; box-shadow:0 18px 50px rgba(25,10,4,.2); }
+.launch-button:hover { background:#f4e4d2; }
+.launch-content > small { margin-top:13px; color:rgba(255,249,242,.62); font-size:8px; letter-spacing:.08em; }
+
+.promotion-active .announcement-bar { height:44px; background:linear-gradient(90deg,#3b2922,#904515 43%,#a65b24); }
+.promotion-active .announcement-bar::before { background:linear-gradient(to right,#3b2922,transparent); }
+.promotion-active .announcement-bar::after { right:190px; background:linear-gradient(to left,#904515,transparent); }
+.promotion-active .announcement-track,.promotion-active .announcement-group { height:44px; }
+.promotion-active .announcement-track { padding-right:0; }
+.promotion-active .announcement-group span { color:#fff9f2; font-weight:600; }
+.promotion-active .announcement-toggle { display:none; }
+.promotion-active .site-header { inset:44px 0 auto; }
+.promotion-clock-mini { position:absolute; z-index:5; inset:0 0 0 auto; width:190px; padding:0 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-left:1px solid rgba(255,255,255,.24); color:#fff9f2; background:#3b2922; line-height:1; }
+.promotion-clock-mini span { margin-bottom:4px; font-size:7px; font-weight:600; letter-spacing:.17em; text-transform:uppercase; color:#eacba6; }
+.promotion-clock-mini strong { font:500 17px/1 var(--serif); letter-spacing:.08em; }
+
+.hero-launch-card { width:fit-content; margin:0 0 23px; padding:9px 10px 9px 15px; display:grid; grid-template-columns:auto auto; align-items:center; gap:2px 16px; border:1px solid rgba(144,69,21,.2); border-radius:8px; color:var(--wine); background:rgba(255,253,249,.7); box-shadow:0 10px 35px rgba(59,41,34,.06); }
+.hero-launch-card > span { grid-column:1; font-size:8px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
+.hero-launch-card strong { grid-column:2; grid-row:1 / span 2; padding:8px 12px; border-radius:6px; color:#fff9f2; background:var(--wine); font:500 22px/1 var(--serif); }
+.hero-launch-card strong b { font-weight:500; }
+.hero-launch-card small { grid-column:1; font-size:9px; color:#816954; }
+
+.product-card.is-promotion { position:relative; }
+.product-promotion-seal { position:absolute; top:10px; right:10px; z-index:3; min-width:54px; padding:8px 9px; border-radius:6px; color:#fff9f2; background:var(--wine); box-shadow:0 7px 18px rgba(59,41,34,.18); font-size:10px; font-weight:600; text-align:center; letter-spacing:.08em; }
+.product-price { display:flex; flex-wrap:wrap; align-items:baseline; gap:3px 8px; line-height:1.15; }
+.price-before { color:#9b8879; font-size:10px; font-weight:500; text-decoration:line-through; text-decoration-thickness:1px; }
+.price-current { color:var(--wine); font-size:16px; font-weight:600; }
+.promotion-active .price-current { color:#7b1f1f; }
+.price-discount { width:100%; color:#7b1f1f; font-size:8px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
+.section-sale-price del { margin-right:5px; color:#9a8879; font-size:.86em; font-weight:400; }
+.section-sale-price strong { color:#7b1f1f; }
+.cart-item-price { margin:3px 0 0; display:flex; align-items:baseline; gap:6px; }
+.cart-item-price .price-current { font-size:12px; }
+.cart-item-price .price-before { font-size:9px; }
+.cart-savings { margin:2px 0 13px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; border-radius:7px; color:#285b43; background:#e8f0e8; font-size:9px; font-weight:600; letter-spacing:.04em; }
+.cart-savings strong { font-size:12px; }
+
+@media(max-width:700px) {
+  .launch-experience { padding:24px 18px; }
+  .launch-close { top:15px; right:15px; width:43px; height:43px; }
+  .launch-content > img { width:143px; height:76px; }
+  .launch-kicker { margin-top:19px; font-size:8px; }
+  .launch-content h2 { font-size:clamp(42px,13vw,59px); }
+  .launch-offer { margin:24px 0 22px; }
+  .launch-offer strong { font-size:58px; }
+  .launch-countdown { gap:6px; width:100%; }
+  .launch-countdown > div { width:62px; padding:11px 4px 9px; }
+  .launch-countdown strong { font-size:25px; }
+  .launch-countdown i { font-size:17px; }
+  .promotion-active .announcement-bar,.promotion-active .announcement-track,.promotion-active .announcement-group { height:40px; }
+  .promotion-active .site-header { inset:40px 0 auto; }
+  .promotion-active .announcement-track { padding-right:0; }
+  .promotion-active .announcement-bar::after { right:126px; }
+  .promotion-clock-mini { width:126px; padding:0 8px; }
+  .promotion-clock-mini strong { font-size:14px; }
+  .promotion-active .announcement-group span { padding-inline:15px; font-size:8px; }
+  .promotion-active .announcement-group span::after { margin-left:24px; }
+  .hero-launch-card { margin-inline:auto; }
+  .product-price { min-width:84px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .launch-experience { transition:none; }
+  .launch-atmosphere { display:none; }
+}
+
+/* Mantém a fita superior em movimento contínuo em todos os aparelhos. */
+.announcement-bar:not(.is-paused) .announcement-track {
+  animation-name: faixa-esquerda !important;
+  animation-duration: 14s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+}
+
+@media(max-width:600px) {
+  .announcement-bar:not(.is-paused) .announcement-track {
+    animation-duration:12s !important;
+  }
+}

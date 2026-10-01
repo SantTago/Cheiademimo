@@ -1,3 +1,39 @@
+## Campanha de inauguração do site — chave única
+
+A campanha foi criada **desligada por padrão**. Abra `script.js` e, logo no início, procure:
+
+```js
+promocao: {
+  ativa: false,
+  descontoPercentual: 10,
+  duracaoHoras: 24,
+  identificadorCampanha: "pre-inauguracao-site-v1",
+  dataFim: "",
+  encerrarAutomaticamente: true,
+  mostrarExperienciaDeEntrada: true,
+},
+```
+
+Para lançar a promoção, mude somente:
+
+```js
+ativa: true,
+```
+
+Ao publicar essa alteração, o site inteiro passa a exibir o preço original riscado e o preço promocional. A mesma porcentagem é aplicada automaticamente nos cartões, nas três coleções, na sacola, no subtotal e na mensagem enviada ao WhatsApp. Também são ativados a faixa especial, o relógio regressivo, os selos de desconto e a experiência de entrada.
+
+- Para mudar o desconto de 10% para outro valor, altere apenas `descontoPercentual`.
+- Para mudar a duração, altere apenas `duracaoHoras`.
+- Com `dataFim: ""`, cada visitante recebe a duração completa na primeira visita à campanha.
+- Para todos os visitantes terminarem no mesmo momento, preencha `dataFim`, por exemplo: `dataFim: "2026-10-04T23:59:59-03:00"`.
+- Quando o relógio chegar a zero, `encerrarAutomaticamente: true` faz o site voltar aos preços normais para o visitante.
+- Para desligar a campanha na publicação para todos, volte para `ativa: false` e envie novamente o `script.js` ao GitHub.
+- Em uma promoção futura, troque também `identificadorCampanha` para um nome novo, como `"black-friday-v1"`, para iniciar um novo relógio.
+
+Os preços originais de cada produto continuam preservados na lista `PRODUTOS`. A campanha calcula o desconto sem modificar esses cadastros.
+
+---
+
 ## Ajuste do banner e das fotos — 29/09/2026
 
 - Banner retangular sem oval, mantendo a largura e a proporção anteriores em computador e celular.

@@ -6,6 +6,27 @@
 const CONFIG = {
   whatsapp: "5591991143369",             // DDI + DDD + número, só dígitos
   mensagemWhatsApp: "Olá! Gostaria de conhecer os produtos da Cheia de Mimo Home.",
+
+  /* ================================================================
+     CHAVE DA CAMPANHA DE LANÇAMENTO
+
+     1. Troque ativa para true e publique o site: a promoção começa.
+     2. Troque descontoPercentual para mudar TODOS os preços de uma vez.
+     3. Troque duracaoHoras para escolher por quanto tempo o relógio roda.
+     4. Quando quiser voltar ao site normal, use ativa: false.
+
+     identificadorCampanha deve ser alterado a cada promoção nova. Isso faz
+     o relógio começar novamente para quem já visitou uma campanha anterior.
+  ================================================================= */
+  promocao: {
+    ativa: true,
+    descontoPercentual: 10,
+    duracaoHoras: 24,
+    identificadorCampanha: "pre-inauguracao-site-v1",
+    dataFim: "", // Opcional: "2026-10-04T23:59:59-03:00" para todos terminarem juntos.
+    encerrarAutomaticamente: true,
+    mostrarExperienciaDeEntrada: true,
+  },
 };
 
 /* CATÁLOGO MANUAL
@@ -230,9 +251,15 @@ const el = {
   cartDrawer: $("[data-cart-drawer]"),
   cartItems: $("[data-cart-items]"),
   cartTotal: $("[data-cart-total]"),
+  cartSavings: $("[data-cart-savings]"),
+  cartSavingsValue: $("[data-cart-savings-value]"),
   cartCounts: document.querySelectorAll("[data-cart-count]"),
   checkout: $("[data-checkout]"),
   toast: $("[data-toast]"),
+  launchExperience: $("[data-launch-experience]"),
+  promotionClock: $("[data-promotion-clock]"),
+  heroLaunch: $("[data-hero-launch]"),
+  heroPrice: $("[data-hero-price]"),
 };
 
 function readCart() {
@@ -244,21 +271,165 @@ function readCart() {
   }
 }
 
+function createPromotionState() {
+  const campaign = CONFIG.promocao || {};
+  const percent = Math.min(99, Math.max(0, Number(campaign.descontoPercentual) || 0));
+  const configured = campaign.ativa === true && percent > 0;
+  const campaignId = String(campaign.identificadorCampanha || "campanha-padrao").trim() || "campanha-padrao";
+  const storageKey = `cheiaDeMimoPromocao:${campaignId}`;
+  let deadline = 0;
+
+  if (configured) {
+    const fixedDeadline = Date.parse(String(campaign.dataFim || "").trim());
+    if (Number.isFinite(fixedDeadline)) {
+      deadline = fixedDeadline;
+    } else {
+      try { deadline = Number(localStorage.getItem(storageKey)) || 0; } catch { deadline = 0; }
+      if (!deadline) {
+        const duration = Math.max(1, Number(campaign.duracaoHoras) || 24);
+        deadline = Date.now() + duration * 60 * 60 * 1000;
+        try { localStorage.setItem(storageKey, String(deadline)); } catch { /* Navegação privada */ }
+      }
+    }
+  }
+
+  const expired = Boolean(deadline && deadline <= Date.now());
+  return {
+    configured,
+    active: configured && (!expired || campaign.encerrarAutomaticamente === false),
+    percent,
+    deadline,
+    storageKey,
+    timer: 0,
+  };
+}
+
 const state = {
   products: PRODUTOS.filter((product) => product.ativo !== false),
   cart: readCart(),
   lastFocus: null,
+  promotion: createPromotionState(),
 };
 
 const money = (value) => new Intl.NumberFormat("pt-BR", {
   style: "currency", currency: "BRL",
 }).format(value);
-const price = (product) => (product.preco > 0 ? money(product.preco) : "Valor sob consulta");
+const originalPrice = (product) => Math.max(0, Number(product.preco) || 0);
+const promotionalPrice = (product) => {
+  const base = originalPrice(product);
+  if (!base || !state.promotion.active) return base;
+  return Math.round(base * (100 - state.promotion.percent)) / 100;
+};
+const price = (product) => (originalPrice(product) > 0 ? money(promotionalPrice(product)) : "Valor sob consulta");
+const priceMarkup = (product, compact = false) => {
+  const base = originalPrice(product);
+  if (!base) return `<span class="price-current">Valor sob consulta</span>`;
+  if (!state.promotion.active) return `<span class="price-current">${money(base)}</span>`;
+  return `<span class="price-before">${money(base)}</span><span class="price-current">${money(promotionalPrice(product))}</span>${compact ? "" : `<span class="price-discount">−${state.promotion.percent}%</span>`}`;
+};
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[character]);
 const normalize = (value) => String(value ?? "").normalize("NFD")
   .replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+function countdownParts(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return { days, hours, minutes, seconds };
+}
+
+function updatePromotionClocks() {
+  if (!state.promotion.active) return;
+  const remaining = Math.max(0, state.promotion.deadline - Date.now());
+  const time = countdownParts(remaining);
+  document.querySelectorAll("[data-countdown-days]").forEach((node) => { node.textContent = String(time.days).padStart(2, "0"); });
+  document.querySelectorAll("[data-countdown-hours]").forEach((node) => { node.textContent = String(time.hours).padStart(2, "0"); });
+  document.querySelectorAll("[data-countdown-minutes]").forEach((node) => { node.textContent = String(time.minutes).padStart(2, "0"); });
+  document.querySelectorAll("[data-countdown-seconds]").forEach((node) => { node.textContent = String(time.seconds).padStart(2, "0"); });
+  const compact = `${time.days ? `${String(time.days).padStart(2, "0")}d ` : ""}${String(time.hours).padStart(2, "0")}:${String(time.minutes).padStart(2, "0")}:${String(time.seconds).padStart(2, "0")}`;
+  document.querySelectorAll("[data-countdown-compact]").forEach((node) => { node.textContent = compact; });
+
+  if (remaining <= 0 && CONFIG.promocao.encerrarAutomaticamente !== false) finishPromotion();
+}
+
+function renderAnnouncementContent() {
+  const normalMessages = [
+    "Jogos americanos que encantam sua mesa",
+    "Coleções pensadas para receber bem",
+    "Detalhes que transformam encontros em memórias",
+    "Monte sua sacola e finalize pelo WhatsApp",
+  ];
+  const saleMessages = [
+    `Inauguração do novo site · ${state.promotion.percent}% de desconto`,
+    "Preço especial aplicado automaticamente em todo o site",
+    "Uma nova experiência Cheia de Mimo começou",
+    "Aproveite antes que o relógio chegue ao fim",
+  ];
+  const messages = state.promotion.active ? saleMessages : normalMessages;
+  const html = messages.map((message) => `<span>${escapeHtml(message)}</span>`).join("");
+  document.querySelectorAll(".announcement-group").forEach((group) => { group.innerHTML = html; });
+}
+
+function openLaunchExperience() {
+  if (!state.promotion.active || !el.launchExperience) return;
+  el.launchExperience.hidden = false;
+  el.body.classList.add("launch-open");
+  requestAnimationFrame(() => el.launchExperience.classList.add("is-visible"));
+  window.setTimeout(() => $("[data-enter-launch]")?.focus(), 250);
+}
+
+function closeLaunchExperience(remember = true) {
+  if (!el.launchExperience || el.launchExperience.hidden) return;
+  el.launchExperience.classList.remove("is-visible");
+  el.body.classList.remove("launch-open");
+  if (remember) {
+    try { sessionStorage.setItem(`${state.promotion.storageKey}:abertura`, "vista"); } catch { /* Navegação privada */ }
+  }
+  window.setTimeout(() => { el.launchExperience.hidden = true; }, 420);
+}
+
+function maybeShowLaunchExperience() {
+  if (!state.promotion.active || CONFIG.promocao.mostrarExperienciaDeEntrada === false || !el.launchExperience) return;
+  let seen = false;
+  try { seen = sessionStorage.getItem(`${state.promotion.storageKey}:abertura`) === "vista"; } catch { seen = false; }
+  if (seen) return;
+  const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : 1350;
+  window.setTimeout(openLaunchExperience, delay);
+}
+
+function applyPromotionUI({ showExperience = true } = {}) {
+  window.clearInterval(state.promotion.timer);
+  el.body.classList.toggle("promotion-active", state.promotion.active);
+  document.querySelectorAll("[data-promotion-percent]").forEach((node) => { node.textContent = state.promotion.percent; });
+  if (el.promotionClock) el.promotionClock.hidden = !state.promotion.active;
+  if (el.heroLaunch) el.heroLaunch.hidden = !state.promotion.active;
+  if (el.heroPrice) el.heroPrice.textContent = state.promotion.active
+    ? `Todos os produtos com ${state.promotion.percent}% OFF`
+    : "Peças a partir de R$ 11,99";
+  renderAnnouncementContent();
+
+  if (state.promotion.active) {
+    updatePromotionClocks();
+    state.promotion.timer = window.setInterval(updatePromotionClocks, 1000);
+    if (showExperience) maybeShowLaunchExperience();
+  } else {
+    closeLaunchExperience(false);
+  }
+}
+
+function finishPromotion() {
+  if (!state.promotion.active) return;
+  state.promotion.active = false;
+  window.clearInterval(state.promotion.timer);
+  applyPromotionUI({ showExperience: false });
+  renderProducts();
+  renderCart();
+  showToast("A condição especial de lançamento foi encerrada.");
+}
 
 function renderProducts() {
   const term = normalize(el.search.value);
@@ -276,10 +447,11 @@ function renderProducts() {
   const cardsHtml = (products) => products.map((product, index) => {
     const hasBack = Boolean(product.exibirVerso && String(product.verso || "").trim());
     return `
-      <article class="product-card reveal" data-delay="${index % 3}">
+      <article class="product-card reveal${state.promotion.active ? " is-promotion" : ""}" data-delay="${index % 3}">
         <div class="product-media">
           <img src="${escapeHtml(product.frente)}" alt="${escapeHtml(product.nome)} — frente" loading="lazy" decoding="async" data-product-image="${product.id}" />
           <span class="media-label">Cheia de Mimo Home</span>
+          ${state.promotion.active ? `<span class="product-promotion-seal">−${state.promotion.percent}%</span>` : ""}
         </div>
         <div class="product-content">
           ${hasBack ? `<div class="side-switcher" role="group" aria-label="Ver fotos de ${escapeHtml(product.nome)}">
@@ -289,16 +461,19 @@ function renderProducts() {
           <h3 class="product-name">${escapeHtml(product.nome)}</h3>
           <p class="product-description">${escapeHtml(product.descricao)}</p>
           <div class="product-purchase">
-            <p class="product-price">${price(product)}</p>
+            <div class="product-price">${priceMarkup(product)}</div>
             <button class="add-button" type="button" data-add-product="${product.id}" aria-label="Adicionar ${escapeHtml(product.nome)} à sacola">Adicionar <span aria-hidden="true">+</span></button>
           </div>
         </div>
       </article>`;
   }).join("");
+  const sectionPrice = (value) => state.promotion.active
+    ? `<span class="section-sale-price"><del>${money(value)}</del> <strong>${money(Math.round(value * (100 - state.promotion.percent)) / 100)}</strong></span>`
+    : `<strong>${money(value)}</strong>`;
   const sections = [
-    { category: "Jogo americano", id: "colecao-original", title: "Jogos americanos", description: "As estampas que você já ama. R$ 29,00 por unidade." },
-    { category: "Jogos americanos em courino", id: "colecao-courino", title: "Jogos americanos em courino", description: "Impermeáveis e fáceis de limpar. R$ 18,00 por unidade." },
-    { category: "Porta-guardanapos", id: "colecao-porta-guardanapos", title: "Porta-guardanapos", description: "Pequenos detalhes para completar sua mesa. R$ 11,99 por unidade." },
+    { category: "Jogo americano", id: "colecao-original", title: "Jogos americanos", description: `As estampas que você já ama. ${sectionPrice(29)} por unidade.` },
+    { category: "Jogos americanos em courino", id: "colecao-courino", title: "Jogos americanos em courino", description: `Impermeáveis e fáceis de limpar. ${sectionPrice(18)} por unidade.` },
+    { category: "Porta-guardanapos", id: "colecao-porta-guardanapos", title: "Porta-guardanapos", description: `Pequenos detalhes para completar sua mesa. ${sectionPrice(11.99)} por unidade.` },
   ];
   el.grid.innerHTML = sections.map((section) => {
     const products = shown.filter((product) => product.categoria === section.category);
@@ -430,7 +605,7 @@ function addToCart(id) {
   state.cart[id] = (Number(state.cart[id]) || 0) + 1;
   saveCart();
   renderCart();
-  showToast("Produto adicionado à sacola");
+  showToast(state.promotion.active ? `Produto adicionado com ${state.promotion.percent}% OFF` : "Produto adicionado à sacola");
 }
 
 function changeQuantity(id, amount) {
@@ -444,9 +619,15 @@ function changeQuantity(id, amount) {
 function renderCart() {
   const entries = cartEntries();
   const count = entries.reduce((total, item) => total + item.quantity, 0);
-  const total = entries.reduce((sum, item) => sum + Math.max(0, Number(item.product.preco) || 0) * item.quantity, 0);
+  const originalTotal = entries.reduce((sum, item) => sum + originalPrice(item.product) * item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + promotionalPrice(item.product) * item.quantity, 0);
+  const savings = Math.max(0, originalTotal - total);
   el.cartCounts.forEach((counter) => { counter.textContent = count; });
   el.cartTotal.textContent = entries.every(({ product }) => product.preco > 0) ? money(total) : "A confirmar";
+  if (el.cartSavings && el.cartSavingsValue) {
+    el.cartSavings.hidden = !(state.promotion.active && entries.length && savings > 0);
+    el.cartSavingsValue.textContent = money(savings);
+  }
   el.checkout.disabled = !entries.length;
 
   if (!entries.length) {
@@ -457,7 +638,7 @@ function renderCart() {
     <article class="cart-item">
       <img src="${escapeHtml(product.frente)}" alt="${escapeHtml(product.nome)}" loading="lazy" />
       <div>
-        <h3>${escapeHtml(product.nome)}</h3><p>${price(product)}</p>
+        <h3>${escapeHtml(product.nome)}</h3><div class="cart-item-price">${priceMarkup(product, true)}</div>
         <div class="quantity" aria-label="Quantidade de ${escapeHtml(product.nome)}">
           <button type="button" data-quantity="-1" data-product-id="${product.id}" aria-label="Diminuir quantidade">−</button>
           <span>${quantity}</span>
@@ -488,12 +669,16 @@ function checkoutWhatsApp() {
   const entries = cartEntries();
   if (!entries.length) return;
   const count = entries.reduce((total, item) => total + item.quantity, 0);
-  const total = entries.reduce((sum, item) => sum + Math.max(0, Number(item.product.preco) || 0) * item.quantity, 0);
+  const originalTotal = entries.reduce((sum, item) => sum + originalPrice(item.product) * item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + promotionalPrice(item.product) * item.quantity, 0);
+  const savings = Math.max(0, originalTotal - total);
   const lines = [
     "Olá! Gostaria de fazer um pedido na Cheia de Mimo Home:", "",
-    ...entries.map(({ product, quantity }) => `• ${product.nome} — ${quantity} ${quantity === 1 ? "unidade" : "unidades"} — ${price(product.preco > 0 ? product : { preco: 0 }) === "Valor sob consulta" ? "valor sob consulta" : money(product.preco * quantity)}`),
+    ...(state.promotion.active ? [`🎉 Condição de lançamento: ${state.promotion.percent}% de desconto`, ""] : []),
+    ...entries.map(({ product, quantity }) => `• ${product.nome} — ${quantity} ${quantity === 1 ? "unidade" : "unidades"} — ${originalPrice(product) > 0 ? money(promotionalPrice(product) * quantity) : "valor sob consulta"}`),
     "", `Total de peças: ${count}`,
     entries.every(({ product }) => product.preco > 0) ? `Subtotal: ${money(total)}` : "Valor: a confirmar",
+    ...(state.promotion.active && savings > 0 ? [`Economia de lançamento: ${money(savings)}`] : []),
     "", "Pode confirmar a disponibilidade e me orientar sobre entrega e pagamento?",
   ];
   window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener,noreferrer");
@@ -597,8 +782,14 @@ el.menu.addEventListener("click", () => {
 });
 el.mobileNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
 
+$("[data-close-launch]")?.addEventListener("click", () => closeLaunchExperience());
+$("[data-enter-launch]")?.addEventListener("click", () => {
+  closeLaunchExperience();
+  window.setTimeout(() => $("#produtos")?.scrollIntoView({ behavior: "smooth", block: "start" }), 180);
+});
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") { closeCart(); closeMenu(); }
+  if (event.key === "Escape") { closeLaunchExperience(); closeCart(); closeMenu(); }
   if (event.key === "Tab" && el.body.classList.contains("cart-open")) {
     const controls = [...el.cartDrawer.querySelectorAll("button:not(:disabled), a[href]")];
     const first = controls[0]; const last = controls[controls.length - 1];
@@ -615,6 +806,7 @@ if (/^55\d{11}$/.test(CONFIG.whatsapp)) {
   const number = CONFIG.whatsapp;
   $("[data-whatsapp-footer]").textContent = `+${number.slice(0, 2)} ${number.slice(2, 4)} ${number.slice(4, 9)}-${number.slice(9)}`;
 }
+applyPromotionUI();
 setupVideos();
 renderProducts();
 renderCart();
