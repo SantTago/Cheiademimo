@@ -1,3 +1,17 @@
+# Atualização do topo — 26/10/2026
+
+A imagem lateral com recorte arredondado foi removida. A abertura agora usa um banner panorâmico de mesa posta, título editorial e acessos às três coleções, com adaptação para celular.
+
+Para atualizar o site existente, substitua `index.html` e `styles.css` e acrescente `assets/mesa-posta-banner.webp`. O ZIP também inclui o site completo. Produtos, fotos, vídeos, JavaScript, preços, promoção e sacola foram preservados.
+
+A imagem de ambientação é ilustrativa, criada com a ferramenta integrada ImageGen. Arquivo: `assets/mesa-posta-banner.webp`. Direção do prompt: fotografia editorial natural de uma mesa posta em casa brasileira, cerâmicas claras, linho, flores e luz de fim de tarde; paleta creme, caramelo, marrom e sálvia; composição horizontal com espaço para título; sem texto, logos, pessoas ou produtos estampados.
+
+A configuração de campanha enviada continua com término em 26/10/2026 às 23h59min59s de Brasília. Este redesenho não altera o período da promoção.
+
+Conferência visual em computador e tela de 390 px. Para visualizar, extraia o ZIP e abra index.html. A publicação do site existente é feita enviando os arquivos extraídos ao mesmo repositório.
+
+---
+
 ## Campanha de inauguração do site — chave única
 
 A campanha foi criada **desligada por padrão**. Abra `script.js` e, logo no início, procure:

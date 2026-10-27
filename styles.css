@@ -864,3 +864,77 @@ body.launch-open { overflow:hidden; }
     animation-duration:12s !important;
   }
 }
+
+/* Abertura editorial — banner panorâmico, sem recorte lateral. */
+.hero.hero-editorial {
+  width:100%; max-width:none; min-height:660px; margin:120px 0 0;
+  padding:0; display:block; position:relative; isolation:isolate;
+  overflow:hidden; background:#392c22;
+}
+.promotion-active .hero.hero-editorial { margin-top:128px; }
+.hero-editorial::before { content:none; }
+.hero-editorial .hero-backdrop { position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:center; z-index:-3; }
+.hero-shade { position:absolute; inset:0; z-index:-2; background:linear-gradient(90deg,rgba(32,24,17,.82) 0%,rgba(32,24,17,.65) 30%,rgba(32,24,17,.16) 67%,rgba(32,24,17,.03)),linear-gradient(0deg,rgba(32,24,17,.58),transparent 30%); }
+.hero-content { width:var(--page); margin:auto; padding:68px 0 24px; min-height:660px; display:flex; flex-direction:column; justify-content:space-between; gap:48px; }
+.hero-editorial .hero-copy { max-width:630px; text-align:left; }
+.hero-editorial .eyebrow { color:#ebd3b6; font-size:10px; letter-spacing:.25em; margin:0 0 23px; }
+.hero-editorial h1 { color:#fffaf1; font:400 clamp(66px,7vw,104px)/.93 var(--serif); letter-spacing:-.035em; margin:0 0 27px; }
+.hero-editorial h1 em { display:inline; margin:0; color:#edc69e; font-weight:400; }
+.hero-editorial .hero-text { color:#f0e5d7; max-width:390px; margin:0; font-size:13px; line-height:1.9; }
+.hero-editorial .hero-actions { justify-content:flex-start; flex-direction:row; margin-top:28px; gap:27px; }
+.hero-editorial .button-primary { color:#56371f; background:#fff8ec; min-height:51px; padding-inline:25px; border-radius:2px; box-shadow:none; }
+.hero-editorial .button-primary:hover { background:#ecd6bb; }
+.hero-editorial .text-link { color:#fff6e8; border-color:#e3caae80; font-size:18px; }
+.hero-bottom { border-top:1px solid #f6e8d63d; padding-top:18px; display:flex; justify-content:space-between; align-items:center; gap:20px; color:#f0e0cd; }
+.hero-bottom > span { font:italic 400 21px/1.2 var(--serif); }
+.hero-editorial .hero-highlights { margin:0; color:#eee0cf; font-size:9px; gap:15px; }
+.hero-editorial .hero-highlights i { background:#edc69e; }
+.hero-editorial .hero-launch-card { margin:0 0 23px; border-color:#f5dcc044; border-radius:2px; background:#33271bb3; box-shadow:none; color:#fff2df; }
+.hero-editorial .hero-launch-card small { color:#efdbc1; }
+.hero-editorial .hero-launch-card strong { color:#523317; background:#ecd6bb; border-radius:1px; }
+.collection-intro { padding:33px max(24px,calc((100vw - 1240px)/2)); background:#f2eadd; border-bottom:1px solid #e1d2bf; display:grid; grid-template-columns:1fr 2.3fr; gap:50px; align-items:center; }
+.collection-intro-title { font:400 27px/1.12 var(--serif); letter-spacing:-.02em; color:var(--brown); }
+.collection-intro-title span,.collection-intro-title em { display:block; }
+.collection-intro-title em { color:var(--wine); font-weight:400; }
+.collection-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.collection-shortcuts a { padding:8px 23px; border-left:1px solid #cdb69d; position:relative; transition:background .2s; }
+.collection-shortcuts a:hover { background:#e8dccb; }
+.collection-shortcuts a > span { display:block; color:#7c6551; font-size:8px; letter-spacing:.1em; text-transform:uppercase; }
+.collection-shortcuts strong { display:block; padding-right:17px; margin-top:7px; color:#75421e; font:500 23px/1.05 var(--serif); }
+.collection-shortcuts i { position:absolute; right:14px; bottom:10px; color:var(--wine); font:normal 18px var(--sans); }
+.hero-editorial a:focus-visible,.collection-shortcuts a:focus-visible { outline:2px solid #b38251; outline-offset:5px; }
+@media(min-width:1600px) { .hero.hero-editorial,.hero-content { min-height:740px; } .hero-content { padding-top:88px; } }
+@media(max-width:1000px) {
+  .hero.hero-editorial,.hero-content { min-height:640px; }
+  .collection-intro { gap:24px; grid-template-columns:.8fr 2.2fr; }
+  .collection-shortcuts a { padding-inline:16px; }
+  .collection-shortcuts strong { font-size:21px; }
+  .collection-shortcuts i { right:8px; }
+}
+@media(max-width:700px) {
+  .hero.hero-editorial { margin-top:110px; min-height:630px; }
+  .promotion-active .hero.hero-editorial { margin-top:114px; }
+  .hero-content { min-height:630px; padding:48px 0 22px; gap:38px; }
+  .hero-editorial .hero-backdrop { object-position:61% center; }
+  .hero-shade { background:linear-gradient(90deg,#201811ba,#20181165),linear-gradient(0deg,#201811b3,transparent 40%); }
+  .hero-editorial h1 { font-size:clamp(57px,12.9vw,80px); line-height:.97; margin-bottom:23px; }
+  .hero-editorial .eyebrow { font-size:8px; letter-spacing:.2em; margin-bottom:22px; }
+  .hero-editorial .hero-text { font-size:12px; }
+  .hero-editorial .hero-actions { gap:20px; flex-wrap:wrap; margin-top:26px; }
+  .hero-editorial .button-primary { min-height:48px; padding-inline:18px; font-size:9px; }
+  .hero-editorial .text-link { font-size:17px; }
+  .hero-bottom { flex-direction:column; align-items:flex-start; gap:13px; padding-top:17px; }
+  .hero-bottom > span { font-size:20px; }
+  .hero-editorial .hero-highlights { font-size:8px; gap:10px; flex-wrap:wrap; }
+  .hero-editorial .hero-launch-card { margin-inline:0; }
+  .collection-intro { display:block; padding:27px 24px 23px; }
+  .collection-intro-title { font-size:26px; margin-bottom:23px; }
+  .collection-intro-title span,.collection-intro-title em { display:inline; }
+  .collection-shortcuts { gap:0; }
+  .collection-shortcuts a { padding:0 10px 22px; }
+  .collection-shortcuts a:first-child { padding-left:0; border-left:none; }
+  .collection-shortcuts a > span { font-size:7px; letter-spacing:.03em; }
+  .collection-shortcuts strong { font-size:20px; padding-right:0; line-height:1.1; margin-top:8px; }
+  .collection-shortcuts i { bottom:-4px; right:auto; }
+}
+@media(max-width:370px) { .hero-editorial .hero-actions { gap:15px; } .hero-editorial .text-link { font-size:15px; } .hero-editorial .hero-highlights { font-size:7px; } }

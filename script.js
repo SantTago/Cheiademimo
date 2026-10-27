@@ -23,7 +23,7 @@ const CONFIG = {
     descontoPercentual: 10,
     duracaoHoras: 24,
     identificadorCampanha: "pre-inauguracao-site-v1",
-    dataFim: "", // Opcional: "2026-10-04T23:59:59-03:00" para todos terminarem juntos.
+    dataFim: "2026-10-31T23:59:59-03:00", // Opcional: "2026-10-04T23:59:59-03:00" para todos terminarem juntos.
     encerrarAutomaticamente: true,
     mostrarExperienciaDeEntrada: true,
   },
